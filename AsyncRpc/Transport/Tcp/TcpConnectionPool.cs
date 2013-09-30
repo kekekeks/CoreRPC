@@ -45,6 +45,7 @@ namespace AsyncRpc.Transport.Tcp
 					var conn = await TcpClientConnection.ConnectAsync(tcpRemote.Host, tcpRemote.Port);
 					if (addToPool)
 						_pool.Add(conn);
+					return conn;
 				}
 				catch (Exception e)
 				{

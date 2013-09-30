@@ -57,16 +57,13 @@ namespace AsyncRpc.Transport.Tcp
 			}
 			try
 			{
-				await SendBytesAsync(data).ConfigureAwait(false);
+				await SendBytesAsync(packet).ConfigureAwait(false);
 			}
-			finally
+			catch(Exception e)
 			{
 				lock (_syncRoot)
-				{
-					if (_ioException != null)
-						throw new AggregateException(_ioException);
 					_pendingRequests.Remove(rid);
-				}
+				tcs.TrySetException(e);
 			}
 			return await tcs.Task;
 		}
@@ -98,7 +95,7 @@ namespace AsyncRpc.Transport.Tcp
 				{
 					_ioException = e;
 					foreach (var tcs in _pendingRequests.Values)
-						tcs.SetException(e);
+						tcs.TrySetException(e);
 					_pendingRequests.Clear();
 					Dispose();
 				}

@@ -52,6 +52,7 @@
     <Compile Include="Routing\ITargetSelector.cs" />
     <Compile Include="Transferable\MethodCallResult.cs" />
     <Compile Include="RequestHandler.cs" />
+    <Compile Include="Transport\GenericHost.cs" />
     <Compile Include="Utility\ConcurentBulkReadOptimizedCache.cs" />
     <Compile Include="Engine.cs" />
     <Compile Include="Transport\IRequestHandler.cs" />

@@ -17,6 +17,7 @@ namespace AsyncRpc.Transport.Tcp
 
 		public TcpHost(IRequestHandler engine)
 		{
+			if (engine == null) throw new ArgumentNullException("engine");
 			_engine = engine;
 		}
 

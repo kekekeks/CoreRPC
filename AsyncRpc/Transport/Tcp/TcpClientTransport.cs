@@ -13,6 +13,7 @@ namespace AsyncRpc.Transport.Tcp
 
 		public TcpClientTransport(string host, int port, int minimumPoolSize = 5, bool enableMultiplexing = true)
 		{
+			if (host == null) throw new ArgumentNullException("host");
 			_pool = new TcpConnectionPool(new[] {new TcpRemote(host, port)});
 			_minimumPoolSize = minimumPoolSize;
 			_enableMultiplexing = enableMultiplexing;

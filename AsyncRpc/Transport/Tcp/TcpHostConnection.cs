@@ -13,6 +13,9 @@ namespace AsyncRpc.Transport.Tcp
 		
 		private TcpHostConnection(TcpHost tcpHost, NetworkStream stream, IRequestHandler engine):base(stream)
 		{
+			if (tcpHost == null) throw new ArgumentNullException("tcpHost");
+			if (stream == null) throw new ArgumentNullException("stream");
+			if (engine == null) throw new ArgumentNullException("engine");
 			_tcpHost = tcpHost;
 			_stream = stream;
 			_engine = engine;

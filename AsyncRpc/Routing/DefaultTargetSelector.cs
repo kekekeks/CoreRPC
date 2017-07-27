@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace AsyncRpc.Routing
 {
@@ -32,7 +33,7 @@ namespace AsyncRpc.Routing
 
 		public void Register(Type iface, Type handler)
 		{
-			if (!iface.IsInterface)
+			if (!iface.GetTypeInfo().IsInterface)
 				throw new ArgumentException("iface should be interface");
 			if (!iface.IsAssignableFrom(handler))
 				throw new ArgumentException("handler should implement iface");

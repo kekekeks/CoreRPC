@@ -73,7 +73,7 @@ namespace AsyncRpc.CodeGen
 							//list.Add(__arg[c])
 							methodIl.Emit(OpCodes.Ldloc, locList);
 							methodIl.Emit(OpCodes.Ldarg, c + 1);
-							if (ifaceMethodInfo.GetParameters()[c].ParameterType.IsValueType)
+							if (ifaceMethodInfo.GetParameters()[c].ParameterType.GetTypeInfo().IsValueType)
 								methodIl.Emit (OpCodes.Box, ifaceMethodInfo.GetParameters ()[c].ParameterType);
 							methodIl.Emit(OpCodes.Castclass, typeof(object));
 							methodIl.Emit(OpCodes.Call, ListAddMethod);

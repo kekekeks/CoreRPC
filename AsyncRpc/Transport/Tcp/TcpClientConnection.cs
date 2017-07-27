@@ -22,16 +22,10 @@ namespace AsyncRpc.Transport.Tcp
 			ReadNextResponse();
 		}
 
-		public static async Task<TcpClientConnection> ConnectAsync(string host, int port)
-		{
-			IPAddress addr;
-			IPAddress[] addrs;
-			if (IPAddress.TryParse(host, out addr))
-				addrs = new[] {addr};
-			else
-				addrs = (await Dns.GetHostAddressesAsync(host));
+		public static async Task<TcpClientConnection> ConnectAsync(IPAddress addr, int port)
+		{			
 			var cl = new TcpClient();
-			await cl.ConnectAsync(addrs, port);
+			await cl.ConnectAsync(new[] { addr }, port);
 			return new TcpClientConnection(cl.GetStream());
 		}
 

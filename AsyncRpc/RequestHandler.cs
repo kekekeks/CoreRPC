@@ -6,6 +6,7 @@ using AsyncRpc.Routing;
 using AsyncRpc.Serialization;
 using AsyncRpc.Transferable;
 using AsyncRpc.Transport;
+using System.Reflection;
 
 namespace AsyncRpc
 {
@@ -55,7 +56,7 @@ namespace AsyncRpc
 					{
 						await task;
 						if (call.Method.ReturnType != typeof (Task))
-							result = task.GetType().GetProperty("Result").GetValue(task);
+							result = task.GetType().GetTypeInfo().GetDeclaredProperty("Result").GetValue(task);
 					}
 				}
 			}

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 
@@ -11,7 +12,7 @@ namespace AsyncRpc.Transport.Tcp
 		private readonly bool _enableMultiplexing;
 		private readonly TcpConnectionPool _pool;
 
-		public TcpClientTransport(string host, int port, int minimumPoolSize = 5, bool enableMultiplexing = true)
+		public TcpClientTransport(IPAddress host, int port, int minimumPoolSize = 5, bool enableMultiplexing = true)
 		{
 			if (host == null) throw new ArgumentNullException("host");
 			_pool = new TcpConnectionPool(new[] {new TcpRemote(host, port)});

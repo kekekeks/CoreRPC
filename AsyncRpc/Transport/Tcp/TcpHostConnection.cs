@@ -55,7 +55,7 @@ namespace AsyncRpc.Transport.Tcp
 				{
 					var size = BitConverter.ToInt32(await _stream.ReadExactlyAsync(4), 0);
 					var req = new Request(this, await _stream.ReadExactlyAsync(size));
-					ThreadPool.QueueUserWorkItem(_ => _engine.HandleRequest(req));
+					Task.Run(() => _engine.HandleRequest(req)).GetAwaiter();
 				}
 			}
 			catch(Exception e)

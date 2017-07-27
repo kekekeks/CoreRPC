@@ -1,11 +1,13 @@
-﻿namespace AsyncRpc.Transport.Tcp
+﻿using System.Net;
+
+namespace AsyncRpc.Transport.Tcp
 {
 	internal class TcpRemote
 	{
-		public string Host;
+		public IPAddress Host;
 		public int Port;
 
-		public TcpRemote (string host, int port)
+		public TcpRemote (IPAddress host, int port)
 		{
 			Host = host;
 			Port = port;

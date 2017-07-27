@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace AsyncRpc.Routing
 {
@@ -7,7 +8,7 @@ namespace AsyncRpc.Routing
 	{
 		private readonly ITargetFactory _factory;
 		private readonly ITargetNameExtractor _extractor;
-		private readonly Dictionary<string, Type> _handlers = new Dictionary<string, Type>();
+		private readonly Dictionary<string, object> _handlers = new Dictionary<string, object>();
 
 		public DefaultTargetSelector() : this(new DefaultTargetFactory(), new DefaultTargetNameExtractor())
 		{
@@ -22,7 +23,7 @@ namespace AsyncRpc.Routing
 
 		public void Register(string name, Type handler)
 		{
-			_handlers.Add(name, handler);
+			_handlers.Add(name, _factory.CreateInstance(handler));
 		}
 
 		public void Register<THandler>(string name)
@@ -30,9 +31,14 @@ namespace AsyncRpc.Routing
 			Register(name, typeof (THandler));
 		}
 
+		public void Register<TInterface, THandler>(THandler instance)
+		{
+			_handlers.Add(_extractor.GetTargetName(typeof(TInterface)), instance);
+		}
+
 		public void Register(Type iface, Type handler)
 		{
-			if (!iface.IsInterface)
+			if (!iface.GetTypeInfo().IsInterface)
 				throw new ArgumentException("iface should be interface");
 			if (!iface.IsAssignableFrom(handler))
 				throw new ArgumentException("handler should implement iface");
@@ -47,7 +53,7 @@ namespace AsyncRpc.Routing
 
 		object ITargetSelector.GetTarget (string target)
 		{
-			return _factory.CreateInstance(_handlers[target]);
+			return _handlers[target];
 		}
 	}
 }

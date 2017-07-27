@@ -8,7 +8,7 @@ namespace AsyncRpc.Routing
 	{
 		private readonly ITargetFactory _factory;
 		private readonly ITargetNameExtractor _extractor;
-		private readonly Dictionary<string, Type> _handlers = new Dictionary<string, Type>();
+		private readonly Dictionary<string, object> _handlers = new Dictionary<string, object>();
 
 		public DefaultTargetSelector() : this(new DefaultTargetFactory(), new DefaultTargetNameExtractor())
 		{
@@ -23,12 +23,17 @@ namespace AsyncRpc.Routing
 
 		public void Register(string name, Type handler)
 		{
-			_handlers.Add(name, handler);
+			_handlers.Add(name, _factory.CreateInstance(handler));
 		}
 
 		public void Register<THandler>(string name)
 		{
 			Register(name, typeof (THandler));
+		}
+
+		public void Register<TInterface, THandler>(THandler instance)
+		{
+			_handlers.Add(_extractor.GetTargetName(typeof(TInterface)), instance);
 		}
 
 		public void Register(Type iface, Type handler)
@@ -48,7 +53,7 @@ namespace AsyncRpc.Routing
 
 		object ITargetSelector.GetTarget (string target)
 		{
-			return _factory.CreateInstance(_handlers[target]);
+			return _handlers[target];
 		}
 	}
 }

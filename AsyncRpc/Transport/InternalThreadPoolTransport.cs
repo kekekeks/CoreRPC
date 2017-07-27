@@ -33,7 +33,7 @@ namespace AsyncRpc.Transport
 		public Task<byte[]> SendMessageAsync(byte[] message)
 		{
 			var tcs = new TaskCompletionSource<byte[]>();
-			Task.Run(() => _engine.HandleRequest(new Request(tcs, message)));
+			ThreadPool.QueueUserWorkItem(_ => _engine.HandleRequest(new Request(tcs, message)));
 			return tcs.Task;
 		}
 	}

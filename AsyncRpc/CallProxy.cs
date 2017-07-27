@@ -44,7 +44,7 @@ namespace AsyncRpc
 			ITaskCompletionSource tcs;
 			if (method.ReturnType == typeof (Task))
 				tcs = new TcsWrapper<object> ();
-			else if (method.ReturnType.GetTypeInfo().IsGenericType && method.ReturnType.GetGenericTypeDefinition() == typeof (Task<>))
+			else if (method.ReturnType.IsGenericType && method.ReturnType.GetGenericTypeDefinition() == typeof (Task<>))
 			{
 				expectedType = method.ReturnType.GetGenericArguments()[0];
 				tcs = (ITaskCompletionSource)

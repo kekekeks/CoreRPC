@@ -6,7 +6,7 @@ namespace AsyncRpc.CodeGen
 {
 	internal static class Generator
 	{
-		private static readonly AssemblyBuilder Asm = AssemblyBuilder.DefineDynamicAssembly(new AssemblyName("AsyncRpc.Generated"),
+		private static readonly AssemblyBuilder Asm = AppDomain.CurrentDomain.DefineDynamicAssembly(new AssemblyName("AsyncRpc.Generated"),
 		                                                                            AssemblyBuilderAccess.Run);
 
 		private static readonly ModuleBuilder Builder = Asm.DefineDynamicModule("Module");
@@ -21,7 +21,7 @@ namespace AsyncRpc.CodeGen
 			{
 				var tb = Builder.DefineType(name);
 				builder(tb);
-				return tb.CreateTypeInfo().AsType();
+				return tb.CreateType();
 			}
 		}
 

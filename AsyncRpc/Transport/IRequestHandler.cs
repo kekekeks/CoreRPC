@@ -1,7 +1,9 @@
-﻿namespace AsyncRpc.Transport
+﻿using System.Threading.Tasks;
+
+namespace AsyncRpc.Transport
 {
 	public interface IRequestHandler
 	{
-		void HandleRequest(IRequest req);
+		Task HandleRequest(IRequest req);
 	}
 }

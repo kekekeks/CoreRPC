@@ -23,7 +23,7 @@ namespace AsyncRpc
 			_serializer = serializer;
 		}
 
-		async void IRequestHandler.HandleRequest (IRequest req)
+		async Task IRequestHandler.HandleRequest (IRequest req)
 		{
 			Exception ex = null;
 			object result = null;

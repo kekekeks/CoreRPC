@@ -16,15 +16,16 @@ namespace Tests
 		public void CheckConnectivity()
 		{
 			var port = GetFreePort();
-			var server = new AsyncRpc.Transport.Tcp.TcpHost(new Handler());
-			server.StartListening(new IPEndPoint(IPAddress.Loopback, port));
-			var client = new AsyncRpc.Transport.Tcp.TcpClientTransport("127.0.0.1", port);
+			
+			using (var server = new AsyncRpc.Transport.Tcp.TcpHost(new Handler()))
+			{
+				server.StartListening(new IPEndPoint(IPAddress.Loopback, port));
+				var client = new AsyncRpc.Transport.Tcp.TcpClientTransport(IPAddress.Parse("127.0.0.1"), port);
 
-			var message = new byte[] {1, 2, 3, 4, 5};
-			var task = client.SendMessageAsync(message);
-			task.Wait();
-
-			Assert.True(task.Result.SequenceEqual(message));
+				var message = new byte[] {1, 2, 3, 4, 5};
+				var data = client.SendMessageAsync(message).Result;
+				Assert.True(data.SequenceEqual(message));
+			}
 		}
 
 		static int GetFreePort()
@@ -38,9 +39,9 @@ namespace Tests
 
 		public class Handler : IRequestHandler
 		{
-			public void HandleRequest(IRequest req)
+			public Task HandleRequest(IRequest req)
 			{
-				req.RespondAsync(req.Data);
+				return req.RespondAsync(req.Data);
 			}
 		}
 	}

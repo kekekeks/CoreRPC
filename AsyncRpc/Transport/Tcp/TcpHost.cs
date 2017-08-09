@@ -42,7 +42,16 @@ namespace AsyncRpc.Transport.Tcp
 					return;
 				task = _listener.AcceptTcpClientAsync ();
 			}
-			var cl = await task;
+			TcpClient cl;
+			try
+			{
+				cl = await task;
+			}
+			catch
+			{
+				//
+				return;
+			}
 			HandleNextConnection();
 			TcpHostConnection.HandleNew(this, cl, _engine);
 		}

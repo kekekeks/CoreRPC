@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace CoreRPC.Routing
 {
-	public class DefaultTargetNameExtractor : ITargetNameExtractor
-	{
-		public string GetTargetName(Type interfaceType)
-		{
-			return interfaceType.Name;
-		}
-	}
+    public class DefaultTargetNameExtractor : ITargetNameExtractor
+    {
+        public string GetTargetName(Type interfaceType)
+        {
+            return interfaceType.Name;
+        }
+    }
 }

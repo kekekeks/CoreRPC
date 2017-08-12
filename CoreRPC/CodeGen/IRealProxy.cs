@@ -8,8 +8,8 @@ using System.Threading.Tasks;
 
 namespace CoreRPC.CodeGen
 {
-	public interface IRealProxy
-	{
-		object Invoke(MethodInfo method, IEnumerable args);
-	}
+    public interface IRealProxy
+    {
+        object Invoke(MethodInfo method, IEnumerable args);
+    }
 }

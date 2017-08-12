@@ -2,8 +2,8 @@
 
 namespace CoreRPC.Transport
 {
-	public interface IRequestHandler
-	{
-		Task HandleRequest(IRequest req);
-	}
+    public interface IRequestHandler
+    {
+        Task HandleRequest(IRequest req);
+    }
 }

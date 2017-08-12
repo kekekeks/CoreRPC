@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace CoreRPC.Transport
 {
-	public interface IClientTransport
-	{
-		Task<byte[]> SendMessageAsync(byte[] message);
-	}
+    public interface IClientTransport
+    {
+        Task<byte[]> SendMessageAsync(byte[] message);
+    }
 }

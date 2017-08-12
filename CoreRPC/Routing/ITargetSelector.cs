@@ -1,7 +1,7 @@
 ﻿namespace CoreRPC.Routing
 {
-	public interface ITargetSelector
-	{
-		object GetTarget(string target);
-	}
+    public interface ITargetSelector
+    {
+        object GetTarget(string target);
+    }
 }

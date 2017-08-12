@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace CoreRPC.Transport
 {
-	public interface IRequest
-	{
-		byte[] Data { get; }
-		Task RespondAsync(byte[] data);
-	}
+    public interface IRequest
+    {
+        byte[] Data { get; }
+        Task RespondAsync(byte[] data);
+    }
 }

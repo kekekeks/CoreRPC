@@ -10,49 +10,49 @@ using Xunit;
 
 namespace Tests
 {
-	public class EngineTests
-	{
-		public interface ITarget
-		{
-			Task FooAsync();
-			Task<string> BarAsync(string arg);
-		}
+    public class EngineTests
+    {
+        public interface ITarget
+        {
+            Task FooAsync();
+            Task<string> BarAsync(string arg);
+        }
 
-		class Target : ITarget
-		{
-			public Task FooAsync()
-			{
-				return Task.FromResult(0);
-			}
+        class Target : ITarget
+        {
+            public Task FooAsync()
+            {
+                return Task.FromResult(0);
+            }
 
-			public Task<string> BarAsync(string arg)
-			{
-				return Task.FromResult(arg + "1");
-			}
-		}
+            public Task<string> BarAsync(string arg)
+            {
+                return Task.FromResult(arg + "1");
+            }
+        }
 
-		private class Selector : ITargetSelector
-		{
-			public object GetTarget(string target)
-			{
-				return new Target();
-			}
-		}
+        private class Selector : ITargetSelector
+        {
+            public object GetTarget(string target)
+            {
+                return new Target();
+            }
+        }
 
-		[Fact]
-		public void TestCalls()
-		{
-			var task = TestCallAsync();
-			task.Wait();
-		}
+        [Fact]
+        public void TestCalls()
+        {
+            var task = TestCallAsync();
+            task.Wait();
+        }
 
-		public async Task TestCallAsync ()
-		{
-			var engine = new Engine();
-			var proxy = engine.CreateProxy<ITarget>(new InternalThreadPoolTransport(engine.CreateRequestHandler(new Selector())));
+        public async Task TestCallAsync ()
+        {
+            var engine = new Engine();
+            var proxy = engine.CreateProxy<ITarget>(new InternalThreadPoolTransport(engine.CreateRequestHandler(new Selector())));
 
-			await proxy.FooAsync();
-			Assert.Equal("x1", await proxy.BarAsync("x"));
-		}
-	}
+            await proxy.FooAsync();
+            Assert.Equal("x1", await proxy.BarAsync("x"));
+        }
+    }
 }

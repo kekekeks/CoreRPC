@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace CoreRPC.Routing
 {
-	public interface ITargetNameExtractor
-	{
-		string GetTargetName(Type interfaceType);
-	}
+    public interface ITargetNameExtractor
+    {
+        string GetTargetName(Type interfaceType);
+    }
 }

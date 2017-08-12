@@ -18,8 +18,8 @@
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
     </ItemGroup>
     <ItemGroup>
-      <ProjectReference Include="..\AsyncRpc.AspNetCore\AsyncRpc.AspNetCore.csproj" />
-      <ProjectReference Include="..\AsyncRpc\AsyncRpc.csproj" />
+      <ProjectReference Include="..\CoreRPC.AspNetCore\CoreRPC.AspNetCore.csproj" />
+      <ProjectReference Include="..\CoreRPC\CoreRPC.csproj" />
     </ItemGroup>
     <ItemGroup>
       <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />

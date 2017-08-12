@@ -7,7 +7,8 @@
   <ItemGroup>
     <PackageReference Include="System.Reflection.Emit" Version="4.3.0" />
     <PackageReference Include="System.Reflection.TypeExtensions" Version="4.4.0-preview2-25405-01" />
-      <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />
+    <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="9.0.0" />
   </ItemGroup>
 
 </Project>

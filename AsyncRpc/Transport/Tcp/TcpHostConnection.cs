@@ -69,7 +69,5 @@ namespace AsyncRpc.Transport.Tcp
 		{
 			new TcpHostConnection (tcpHost, cl.GetStream (), engine).StartReading ();
 		}
-
-
 	}
 }

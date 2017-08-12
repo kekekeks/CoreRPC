@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26510.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AsyncRpc", "AsyncRpc\AsyncRpc.csproj", "{6EDF84FF-70A0-454D-A946-65481405D05B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoreRPC", "CoreRPC\CoreRPC.csproj", "{6EDF84FF-70A0-454D-A946-65481405D05B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{9FC60936-8467-4119-8471-1E934557856B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AsyncRpc.AspNetCore", "AsyncRpc.AspNetCore\AsyncRpc.AspNetCore.csproj", "{20E4095E-D61A-46D3-8BDE-FD7E786D36F4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoreRPC.AspNetCore", "CoreRPC.AspNetCore\CoreRPC.AspNetCore.csproj", "{20E4095E-D61A-46D3-8BDE-FD7E786D36F4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

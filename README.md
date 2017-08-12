@@ -2,7 +2,7 @@
 
 Extensible library for WCF-like RPC targeting netstandard1.3 (compatible with .NET, Mono and .NET Core)
 
-TCP transport supports connection pooling and multiplexing requests within one connection, infrastructure itself allows multiple "services" to be hosted inside one host. You may define your own handler factory or "routing" mechanism. Serializer (XmlSerializer is used by default) is also easy to replace.
+TCP transport supports connection pooling and multiplexing requests within one connection, infrastructure itself allows multiple "services" to be hosted inside one host. You may define your own handler factory or "routing" mechanism. Serializer (JSON.NET is used by default) is also easy to replace.
 
 ## How to use
 

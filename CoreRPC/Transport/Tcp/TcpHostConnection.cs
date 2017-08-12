@@ -3,7 +3,7 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace AsyncRpc.Transport.Tcp
+namespace CoreRPC.Transport.Tcp
 {
 	internal class TcpHostConnection : TcpConnection
 	{

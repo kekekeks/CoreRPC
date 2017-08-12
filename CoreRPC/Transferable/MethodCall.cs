@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace AsyncRpc.Transferable
+namespace CoreRPC.Transferable
 {
 	public class MethodCall
 	{

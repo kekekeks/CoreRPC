@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 
-namespace AsyncRpc.Transport.Http
+namespace CoreRPC.Transport.Http
 {
-	public static class AsyncRpcAspNetCoreExtensions
+	public static class CoreRPCAspNetCoreExtensions
 	{
 		class Request : IRequest
 		{
@@ -29,7 +29,7 @@ namespace AsyncRpc.Transport.Http
 			await handler.HandleRequest(new Request(context, ms.ToArray()));
 		}
 
-		public static IApplicationBuilder UseAsyncRpc(this IApplicationBuilder builder, PathString path, IRequestHandler handler, Func<HttpContext, Func<Task>, Task> hook = null)
+		public static IApplicationBuilder UseCoreRPC(this IApplicationBuilder builder, PathString path, IRequestHandler handler, Func<HttpContext, Func<Task>, Task> hook = null)
 			=> builder.Use((context, next) =>
 			{
 				if (context.Request.Path == path && context.Request.Method == "POST")

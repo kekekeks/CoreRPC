@@ -6,15 +6,15 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using AsyncRpc.Binding;
-using AsyncRpc.CodeGen;
-using AsyncRpc.Routing;
-using AsyncRpc.Serialization;
-using AsyncRpc.Transferable;
-using AsyncRpc.Transport;
-using AsyncRpc.Utility;
+using CoreRPC.Binding;
+using CoreRPC.CodeGen;
+using CoreRPC.Routing;
+using CoreRPC.Serialization;
+using CoreRPC.Transferable;
+using CoreRPC.Transport;
+using CoreRPC.Utility;
 
-namespace AsyncRpc
+namespace CoreRPC
 {
 	class CallProxy : IRealProxy
 	{

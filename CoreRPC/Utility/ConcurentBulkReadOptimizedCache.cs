@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace AsyncRpc.Utility
+namespace CoreRPC.Utility
 {
 	public class ConcurentBulkReadOptimizedCache<TKey, TValue>
 	{

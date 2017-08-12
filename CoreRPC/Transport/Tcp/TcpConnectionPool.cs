@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace AsyncRpc.Transport.Tcp
+namespace CoreRPC.Transport.Tcp
 {
 	internal class TcpConnectionPool
 	{

@@ -2,11 +2,11 @@
 using System.Reflection;
 using System.Reflection.Emit;
 
-namespace AsyncRpc.CodeGen
+namespace CoreRPC.CodeGen
 {
 	internal static class Generator
 	{
-		private static readonly AssemblyBuilder Asm = AssemblyBuilder.DefineDynamicAssembly(new AssemblyName("AsyncRpc.Generated"),
+		private static readonly AssemblyBuilder Asm = AssemblyBuilder.DefineDynamicAssembly(new AssemblyName("CoreRPC.Generated"),
 		                                                                            AssemblyBuilderAccess.Run);
 
 		private static readonly ModuleBuilder Builder = Asm.DefineDynamicModule("Module");

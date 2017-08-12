@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-namespace AsyncRpc.Transport.Tcp
+namespace CoreRPC.Transport.Tcp
 {
 	internal class TcpRemote
 	{

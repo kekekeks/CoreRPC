@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
-using AsyncRpc.Binding;
-using AsyncRpc.Routing;
-using AsyncRpc.Transferable;
+using CoreRPC.Binding;
+using CoreRPC.Routing;
+using CoreRPC.Transferable;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Bson;
 
-namespace AsyncRpc.Serialization
+namespace CoreRPC.Serialization
 {
     public class JsonMethodCallSerializer : IMethodCallSerializer
     {

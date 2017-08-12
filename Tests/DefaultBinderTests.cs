@@ -4,8 +4,8 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using AsyncRpc.Binding;
-using AsyncRpc.Binding.Default;
+using CoreRPC.Binding;
+using CoreRPC.Binding.Default;
 using Xunit;
 
 namespace Tests

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 
-namespace AsyncRpc.Binding.Default
+namespace CoreRPC.Binding.Default
 {
 	public class DefaultMethodBinder : IMethodBinder
 	{

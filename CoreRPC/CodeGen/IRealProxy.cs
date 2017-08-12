@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AsyncRpc.CodeGen
+namespace CoreRPC.CodeGen
 {
 	public interface IRealProxy
 	{

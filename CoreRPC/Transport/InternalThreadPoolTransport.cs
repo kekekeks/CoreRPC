@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 
-namespace AsyncRpc.Transport
+namespace CoreRPC.Transport
 {
 	public class InternalThreadPoolTransport : IClientTransport
 	{

@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using AsyncRpc.Transport;
+using CoreRPC.Transport;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Xunit;
-using AsyncRpc.Transport.Http;
+using CoreRPC.Transport.Http;
 using Microsoft.AspNetCore.Http;
 
 namespace Tests
@@ -31,7 +31,7 @@ namespace Tests
 
 			public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 			{
-				app.UseAsyncRpc("/rpc", this);
+				app.UseCoreRPC("/rpc", this);
 			}
 
 

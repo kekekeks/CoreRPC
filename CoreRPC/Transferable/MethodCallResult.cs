@@ -1,4 +1,4 @@
-﻿namespace AsyncRpc.Transferable
+﻿namespace CoreRPC.Transferable
 {
 	public class MethodCallResult
 	{

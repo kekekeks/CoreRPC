@@ -9,7 +9,7 @@ using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AsyncRpc.CodeGen
+namespace CoreRPC.CodeGen
 {
 	public static class ProxyGen
 	{

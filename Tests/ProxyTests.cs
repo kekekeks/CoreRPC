@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using AsyncRpc.CodeGen;
+using CoreRPC.CodeGen;
 using Xunit;
 
 namespace Tests

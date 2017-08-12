@@ -5,7 +5,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
-using AsyncRpc.Transport;
+using CoreRPC.Transport;
 using Xunit;
 
 namespace Tests
@@ -17,10 +17,10 @@ namespace Tests
 		{
 			var port = GetFreePort();
 			
-			using (var server = new AsyncRpc.Transport.Tcp.TcpHost(new Handler()))
+			using (var server = new CoreRPC.Transport.Tcp.TcpHost(new Handler()))
 			{
 				server.StartListening(new IPEndPoint(IPAddress.Loopback, port));
-				var client = new AsyncRpc.Transport.Tcp.TcpClientTransport(IPAddress.Parse("127.0.0.1"), port);
+				var client = new CoreRPC.Transport.Tcp.TcpClientTransport(IPAddress.Parse("127.0.0.1"), port);
 
 				var message = new byte[] {1, 2, 3, 4, 5};
 				var data = client.SendMessageAsync(message).Result;

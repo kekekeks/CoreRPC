@@ -4,7 +4,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 
-namespace AsyncRpc.Transport.Tcp
+namespace CoreRPC.Transport.Tcp
 {
 	public class TcpClientTransport : IClientTransport
 	{

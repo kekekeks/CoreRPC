@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using AsyncRpc;
-using AsyncRpc.Routing;
-using AsyncRpc.Transport;
+using CoreRPC;
+using CoreRPC.Routing;
+using CoreRPC.Transport;
 using Xunit;
 
 namespace Tests

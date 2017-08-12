@@ -1,14 +1,14 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
-using AsyncRpc.Binding;
-using AsyncRpc.Routing;
-using AsyncRpc.Serialization;
-using AsyncRpc.Transferable;
-using AsyncRpc.Transport;
+using CoreRPC.Binding;
+using CoreRPC.Routing;
+using CoreRPC.Serialization;
+using CoreRPC.Transferable;
+using CoreRPC.Transport;
 using System.Reflection;
 
-namespace AsyncRpc
+namespace CoreRPC
 {
 	class RequestHandler : IRequestHandler
 	{

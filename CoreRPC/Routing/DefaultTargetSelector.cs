@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace AsyncRpc.Routing
+namespace CoreRPC.Routing
 {
 	public class DefaultTargetSelector : ITargetSelector
 	{

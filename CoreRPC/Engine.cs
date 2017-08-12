@@ -1,11 +1,11 @@
-﻿using AsyncRpc.Binding;
-using AsyncRpc.Binding.Default;
-using AsyncRpc.CodeGen;
-using AsyncRpc.Routing;
-using AsyncRpc.Serialization;
-using AsyncRpc.Transport;
+﻿using CoreRPC.Binding;
+using CoreRPC.Binding.Default;
+using CoreRPC.CodeGen;
+using CoreRPC.Routing;
+using CoreRPC.Serialization;
+using CoreRPC.Transport;
 
-namespace AsyncRpc
+namespace CoreRPC
 {
 	public class Engine
 	{

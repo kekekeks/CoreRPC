@@ -1,4 +1,4 @@
-﻿namespace AsyncRpc.Routing
+﻿namespace CoreRPC.Routing
 {
 	public interface ITargetSelector
 	{

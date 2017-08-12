@@ -5,11 +5,11 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using AsyncRpc.Binding;
-using AsyncRpc.Routing;
-using AsyncRpc.Transferable;
+using CoreRPC.Binding;
+using CoreRPC.Routing;
+using CoreRPC.Transferable;
 
-namespace AsyncRpc.Serialization
+namespace CoreRPC.Serialization
 {
 	public interface IMethodCallSerializer
 	{

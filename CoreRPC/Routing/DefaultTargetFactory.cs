@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AsyncRpc.Routing
+namespace CoreRPC.Routing
 {
 	public class DefaultTargetFactory : ITargetFactory
 	{

@@ -4,7 +4,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AsyncRpc.Transport.Http
+namespace CoreRPC.Transport.Http
 {
     public class HttpClientTransport : IClientTransport
     {

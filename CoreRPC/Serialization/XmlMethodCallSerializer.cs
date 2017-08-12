@@ -3,12 +3,12 @@ using System.IO;
 using System.Linq;
 using System.Xml;
 using System.Xml.Serialization;
-using AsyncRpc.Binding;
-using AsyncRpc.Routing;
-using AsyncRpc.Transferable;
-using AsyncRpc.Utility;
+using CoreRPC.Binding;
+using CoreRPC.Routing;
+using CoreRPC.Transferable;
+using CoreRPC.Utility;
 
-namespace AsyncRpc.Serialization
+namespace CoreRPC.Serialization
 {
 	/// <summary>
 	/// Implementation limitations: root element children MUST be in exactly same order that is used by serializer

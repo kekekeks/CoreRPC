@@ -59,6 +59,13 @@ namespace CoreRPC.CodeGen
 
                     foreach (var ifaceMethodInfo in iface.GetMethods())
                     {
+                        if (!typeof(Task).IsAssignableFrom(ifaceMethodInfo.ReturnType))
+                            throw new ArgumentException(ifaceMethodInfo.Name + "should have Task return type");
+
+                        var isVoidReturn = ifaceMethodInfo.ReturnType == typeof(Task);
+                        var actualReturnType =
+                            isVoidReturn ? typeof(void) : ifaceMethodInfo.ReturnType.GetGenericArguments()[0];
+
                         var method = builder.DefineMethod(ifaceMethodInfo.Name, MethodAttributes.Public | MethodAttributes.Virtual, ifaceMethodInfo.ReturnType,
                                                           ifaceMethodInfo.GetParameters().Select(p => p.ParameterType).ToArray());
                         var methodIl = method.GetILGenerator();
@@ -89,16 +96,11 @@ namespace CoreRPC.CodeGen
                         methodIl.Emit(OpCodes.Ldsfld, mnfoField);
                         methodIl.Emit(OpCodes.Ldloc, locList);
                         methodIl.Emit(OpCodes.Castclass, typeof (IEnumerable));
-                        
-                        methodIl.Emit (OpCodes.Call, ProxyInvoke);
 
-                        if (ifaceMethodInfo.ReturnType != typeof (void))
-                        {
-                            methodIl.Emit(OpCodes.Unbox_Any, ifaceMethodInfo.ReturnType);
-                        }
-                        else
-                            methodIl.Emit(OpCodes.Pop);
+                        var specializedInvoke =
+                            ProxyInvoke.MakeGenericMethod(isVoidReturn ? typeof(object) : actualReturnType);
 
+                        methodIl.Emit (OpCodes.Call, specializedInvoke);
 
                         methodIl.Emit(OpCodes.Ret);
 

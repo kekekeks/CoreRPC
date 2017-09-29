@@ -10,6 +10,6 @@ namespace CoreRPC.CodeGen
 {
     public interface IRealProxy
     {
-        object Invoke(MethodInfo method, IEnumerable args);
+        Task<T> Invoke<T>(MethodInfo method, IEnumerable args);
     }
 }

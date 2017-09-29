@@ -52,16 +52,17 @@ namespace Tests
 
         public interface IFoo
         {
-            void Test(int x, List<string> y);
+            Task Test(int x, List<string> y);
         }
 
         private class Target : IFoo
         {
-            public void Test(int x, List<string> y)
+            public Task Test(int x, List<string> y)
             {
                 Assert.Equal(1, x);
                 Assert.Equal("2", y[0]);
                 Assert.Equal("3", y[1]);
+                return Task.CompletedTask;
             }
         }
 
@@ -84,7 +85,7 @@ namespace Tests
         protected class Proxy : IRealProxy
         {
             public MethodCall LastCall;
-            public object Invoke(MethodInfo method, IEnumerable args)
+            public Task<T> Invoke<T>(MethodInfo method, IEnumerable args)
             {
                 LastCall = new MethodCall { Method = method, Arguments = args.Cast<object>().ToArray() };
                 return null;
@@ -156,7 +157,7 @@ namespace Tests
 
         public interface IBar
         {
-            void Test(object arg1, object[] arg2);
+            Task Test(object arg1, object[] arg2);
         }
         
         public TypePreservingMethodCallSerializerTests(IMethodCallSerializer serializer) : base(serializer)
@@ -170,11 +171,12 @@ namespace Tests
 
         class Target : IBar
         {
-            public void Test(object arg1, object[] arg2)
+            public Task Test(object arg1, object[] arg2)
             {
                 Assert.IsType<A>(arg1);
                 Assert.IsType<B>(arg2[0]);
                 Assert.IsType<C>(arg2[1]);
+                return Task.CompletedTask;
             }
         }
 

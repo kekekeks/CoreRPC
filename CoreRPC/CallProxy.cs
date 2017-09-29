@@ -31,43 +31,18 @@ namespace CoreRPC
             _targetName = targetName;
         }
 
-        public object Invoke(MethodInfo method, IEnumerable args)
+        public async Task<T> Invoke<T>(MethodInfo method, IEnumerable args)
         {
             var ms = new MemoryStream();
-            Type expectedType = null;
             _serializer.SerializeCall(ms, _binder, _targetName, new MethodCall
                 {
                     Method = method,
                     Arguments = args.Cast<object>().ToArray()
                 });
-
-            ITaskCompletionSource tcs;
-            if (method.ReturnType == typeof (Task))
-                tcs = new TcsWrapper<object> ();
-            else if (method.ReturnType.GetTypeInfo().IsGenericType && method.ReturnType.GetGenericTypeDefinition() == typeof (Task<>))
-            {
-                expectedType = method.ReturnType.GetGenericArguments()[0];
-                tcs = (ITaskCompletionSource)
-                      Activator.CreateInstance(
-                          typeof (TcsWrapper<>).MakeGenericType(expectedType));
-            }
-            else
-                throw new InvalidOperationException("Non Task/Task<T> return values aren't supported");
-
-            SendAndParseResponse(ms.ToArray(), expectedType).ContinueWith(t =>
-                {
-                    if (t.IsFaulted)
-                    {
-                        tcs.SetException(t.Exception);
-                        return;
-                    }
-                    var rslt = t.Result;
-                    if (rslt.Exception != null)
-                        tcs.SetException(new Exception(rslt.Exception));
-                    else
-                        tcs.SetResultOrCastException(rslt.Result);
-                });
-            return tcs.Task;
+            var res = await SendAndParseResponse(ms.ToArray(), typeof(T));
+            if(res.Exception != null)
+                throw new Exception(res.Exception);
+            return (T) res.Result;
         }
 
         async Task<MethodCallResult> SendAndParseResponse(byte[] data, Type expectedType)

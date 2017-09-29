@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 using CoreRPC.CodeGen;
 using Xunit;
 
@@ -21,10 +22,10 @@ namespace Tests
         {
             public object NextRet;
             public List<SavedCall> Calls = new List<SavedCall>();
-            public object Invoke(MethodInfo method, IEnumerable args)
+            public Task<T> Invoke<T>(MethodInfo method, IEnumerable args)
             {
                 Calls.Add(new SavedCall {Method = method, Arguments = args.Cast<object>().ToArray()});
-                return NextRet;
+                return Task.FromResult((T)NextRet);
             }
         }
 
@@ -35,8 +36,8 @@ namespace Tests
 
         public interface ISimple
         {
-            int Foo(int x, string y);
-            void Bar();
+            Task<int> Foo(int x, string y);
+            Task Bar();
         }
 
         [Fact]
@@ -51,7 +52,7 @@ namespace Tests
             var proxy = new MyProxy() {NextRet = 5};
             var tproxy = ProxyGen.CreateInstance<ISimple>(proxy);
             tproxy.Bar();
-            Assert.Equal(5, tproxy.Foo(1, "2"));
+            Assert.Equal(5, tproxy.Foo(1, "2").Result);
             Assert.Equal(2, proxy.Calls.Count);
             Assert.Equal(1, proxy.Calls[1].Arguments[0]);
             Assert.Equal("2", proxy.Calls[1].Arguments[1]);

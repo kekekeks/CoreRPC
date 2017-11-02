@@ -68,7 +68,7 @@ namespace CoreRPC.Transport.Tcp
 
         internal void FireNetworkError(Exception e)
         {
-            NetworkError(this, e);
+            NetworkError?.Invoke(this, e);
         }
 
         public void Dispose()

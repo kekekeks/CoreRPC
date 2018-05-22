@@ -14,7 +14,8 @@ namespace CoreRPC.Serialization
     public interface IMethodCallSerializer
     {
         void SerializeCall(Stream stream, IMethodBinder binder, string target, MethodCall call);
-        MethodCall DeserializeCall(Stream stream, IMethodBinder binder, ITargetSelector selector);
+        MethodCall DeserializeCall(Stream stream, IMethodBinder binder,
+            ITargetSelector selector, object callContext);
         void SerializeResult(Stream stream, object result);
         void SerializeException(Stream stream, string exception);
         

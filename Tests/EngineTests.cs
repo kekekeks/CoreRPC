@@ -33,7 +33,7 @@ namespace Tests
 
         private class Selector : ITargetSelector
         {
-            public object GetTarget(string target)
+            public object GetTarget(string target, object callContext)
             {
                 return new Target();
             }

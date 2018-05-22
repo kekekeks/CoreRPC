@@ -14,11 +14,14 @@ namespace CoreRPC.Transport
         {
             private readonly TaskCompletionSource<byte[]> _tcs;
 
-            public Request(byte[] data, TaskCompletionSource<byte[]> tcs)
+            public Request(byte[] data, TaskCompletionSource<byte[]> tcs, object context = null)
             {
                 Data = data;
+                Context = context;
                 _tcs = tcs;
             }
+
+            public object Context { get; }
 
             public Task RespondAsync(byte[] data)
             {

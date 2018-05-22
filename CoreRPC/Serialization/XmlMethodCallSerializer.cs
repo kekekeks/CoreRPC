@@ -86,7 +86,8 @@ namespace CoreRPC.Serialization
 
         }
 
-        public MethodCall DeserializeCall(Stream stream, IMethodBinder info, ITargetSelector selector)
+        public MethodCall DeserializeCall(Stream stream, IMethodBinder info,
+            ITargetSelector selector, object callContext)
         {
             var reader = XmlReader.Create(stream);
 
@@ -97,7 +98,7 @@ namespace CoreRPC.Serialization
 
             reader.ReadStartElement("MethodCall"); //Skip root node
 
-            rv.Target = selector.GetTarget(reader.ReadElementContentAsString());
+            rv.Target = selector.GetTarget(reader.ReadElementContentAsString(), callContext);
             rv.Method = info.GetInfoProviderFor(rv.Target).GetMethod(Convert.FromBase64String(reader.ReadElementContentAsString()));
 
             reader.ReadStartElement("Arguments");

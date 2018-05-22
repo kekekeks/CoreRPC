@@ -23,6 +23,7 @@ namespace CoreRPC.Transport
             }
 
             public byte[] Data { get; private set; }
+            public object Context { get; } = null;
             public Task RespondAsync(byte[] data)
             {
                 _tcs.SetResult(data);

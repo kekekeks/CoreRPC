@@ -36,6 +36,7 @@ namespace CoreRPC.Transport.Tcp
             }
 
             public byte[] Data { get; private set; }
+            public object Context { get; } = null;
 
             public Task RespondAsync(byte[] data)
             {

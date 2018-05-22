@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
@@ -18,6 +18,7 @@ namespace CoreRPC.Transport.Http
                 Data = data;
             }
             public byte[] Data { get; }
+            public object Context => _ctx;
 
             public Task RespondAsync(byte[] data) => _ctx.Response.Body.WriteAsync(data, 0, data.Length);
         }

@@ -9,6 +9,7 @@ namespace CoreRPC.Transport
     public interface IRequest
     {
         byte[] Data { get; }
+        object Context { get; }
         Task RespondAsync(byte[] data);
     }
 }

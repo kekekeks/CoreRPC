@@ -51,7 +51,7 @@ namespace CoreRPC.Routing
         }
 
 
-        object ITargetSelector.GetTarget (string target)
+        object ITargetSelector.GetTarget (string target, object callContext)
         {
             return _handlers[target];
         }

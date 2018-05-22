@@ -75,9 +75,10 @@ namespace Tests
                 _target = target;
             }
 
-            public object GetTarget(string target)
+            public object GetTarget(string target, object callContext)
             {
                 Assert.Equal("Target", target);
+                Assert.Equal("ctx", callContext);
                 return _target;
             }
         }
@@ -106,7 +107,7 @@ namespace Tests
             ser.SerializeCall(ms, binder, "Target", proxy.LastCall);
             ms.Seek(0, SeekOrigin.Begin);
 
-            var call = ser.DeserializeCall(ms, binder, new TargetSelector(new Target()));
+            var call = ser.DeserializeCall(ms, binder, new TargetSelector(new Target()), "ctx");
             call.Method.Invoke(call.Target, call.Arguments);
         }
 
@@ -193,7 +194,7 @@ namespace Tests
             ser.SerializeCall(ms, binder, "Target", proxy.LastCall);
             ms.Seek(0, SeekOrigin.Begin);
             
-            var call = ser.DeserializeCall(ms, binder, new TargetSelector(new Target()));
+            var call = ser.DeserializeCall(ms, binder, new TargetSelector(new Target()), "ctx");
             call.Method.Invoke(call.Target, call.Arguments);
         }
     }

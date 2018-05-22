@@ -55,12 +55,13 @@ namespace CoreRPC.Serialization
 
 
 
-        public MethodCall DeserializeCall(Stream stream, IMethodBinder binder, ITargetSelector selector)
+        public MethodCall DeserializeCall(Stream stream, IMethodBinder binder,
+            ITargetSelector selector, object callContext)
         {
             var reader = CreateReader(stream).MoveToContent();
             var rv = new MethodCall
             {
-                Target = selector.GetTarget(reader.ReadProperty("Target").ToString())
+                Target = selector.GetTarget(reader.ReadProperty("Target").ToString(), callContext)
             };
 
             var osig = reader.ReadProperty("MethodSignature");

@@ -30,7 +30,7 @@ namespace CoreRPC
             MethodCall call = null;
             try
             {
-                call = _serializer.DeserializeCall(new MemoryStream(req.Data), _binder, _selector);
+                call = _serializer.DeserializeCall(new MemoryStream(req.Data), _binder, _selector, req.Context);
             }
             catch (Exception e)
             {

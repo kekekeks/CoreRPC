@@ -8,7 +8,8 @@ namespace CoreRPC.Routing
     {
         private readonly ITargetFactory _factory;
         private readonly ITargetNameExtractor _extractor;
-        private readonly Dictionary<string, object> _handlers = new Dictionary<string, object>();
+        private readonly Dictionary<string, Type> _handlers = new Dictionary<string, Type>();
+        private readonly Dictionary<string, object> _instanceHandlers = new Dictionary<string, object>();
 
         public DefaultTargetSelector() : this(new DefaultTargetFactory(), new DefaultTargetNameExtractor())
         {
@@ -23,7 +24,7 @@ namespace CoreRPC.Routing
 
         public void Register(string name, Type handler)
         {
-            _handlers.Add(name, _factory.CreateInstance(handler));
+            _handlers.Add(name, handler);
         }
 
         public void Register<THandler>(string name)
@@ -33,7 +34,7 @@ namespace CoreRPC.Routing
 
         public void Register<TInterface, THandler>(THandler instance)
         {
-            _handlers.Add(_extractor.GetTargetName(typeof(TInterface)), instance);
+            _instanceHandlers.Add(_extractor.GetTargetName(typeof(TInterface)), instance);
         }
 
         public void Register(Type iface, Type handler)
@@ -53,7 +54,11 @@ namespace CoreRPC.Routing
 
         object ITargetSelector.GetTarget (string target, object callContext)
         {
-            return _handlers[target];
+            if (_instanceHandlers.TryGetValue(target, out var instance))
+                return instance;
+            if (_handlers.TryGetValue(target, out var type))
+                return _factory.CreateInstance(type, callContext);
+            throw new ArgumentException($"Handler for {target} is not registered");
         }
     }
 }

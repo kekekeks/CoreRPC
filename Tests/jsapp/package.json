@@ -1,0 +1,19 @@
+{
+  "name": "jsapp",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "start": "ts-node ./app.ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^10.3.4",
+    "ts-node": "^6.1.1",
+    "typescript": "^2.9.2"
+  },
+  "dependencies": {
+    "@types/node-fetch": "^2.1.1",
+    "node-fetch": "^2.1.2"
+  }
+}

@@ -15,12 +15,26 @@ namespace CoreRPC
         private readonly ITargetSelector _selector;
         private readonly IMethodBinder _binder;
         private readonly IMethodCallSerializer _serializer;
+        private readonly IMethodCallInterceptor _interceptor;
 
-        public RequestHandler(ITargetSelector selector, IMethodBinder binder, IMethodCallSerializer serializer)
+        public RequestHandler(ITargetSelector selector, IMethodBinder binder,
+            IMethodCallSerializer serializer, IMethodCallInterceptor interceptor)
         {
             _selector = selector;
             _binder = binder;
             _serializer = serializer;
+            _interceptor = interceptor;
+        }
+
+        static async Task<object> ConvertToTask(object ires)
+        {
+            if (ires is Task task)
+            {
+                await task;
+                var prop = task.GetType().GetProperty("Result");
+                return prop?.GetValue(task);
+            }
+            return ires;
         }
 
         async Task IRequestHandler.HandleRequest (IRequest req)
@@ -41,7 +55,13 @@ namespace CoreRPC
                 object res = null;
                 try
                 {
-                    res = call.Method.Invoke(call.Target, call.Arguments);
+                    if (_interceptor != null)
+                    {
+                        res = _interceptor.Intercept(call, req.Context,
+                            () => ConvertToTask(call.Method.Invoke(call.Target, call.Arguments)));
+                    }
+                    else
+                        res = call.Method.Invoke(call.Target, call.Arguments);
                 }
                 catch (Exception e)
                 {
@@ -56,7 +76,7 @@ namespace CoreRPC
                     {
                         await task;
                         if (call.Method.ReturnType != typeof (Task))
-                            result = task.GetType().GetTypeInfo().GetDeclaredProperty("Result").GetValue(task);
+                            result = task.GetType().GetProperty("Result")?.GetValue(task);
                     }
                 }
             }

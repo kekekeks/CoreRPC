@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CoreRPC.AspNetCore;
 using CoreRPC.Transport;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -31,7 +32,7 @@ namespace Tests
 
             public void Configure(IApplicationBuilder app, IHostingEnvironment env)
             {
-                app.UseCoreRPC("/rpc", this);
+                app.UseCoreRpc("/rpc", this);
             }
 
 

@@ -27,7 +27,12 @@ namespace CoreRPC
 
         public IRequestHandler CreateRequestHandler(ITargetSelector selector)
         {
-            return new RequestHandler(selector, _binder, _serializer);
+            return new RequestHandler(selector, _binder, _serializer, null);
+        }
+        
+        public IRequestHandler CreateRequestHandler(ITargetSelector selector, IMethodCallInterceptor interceptor)
+        {
+            return new RequestHandler(selector, _binder, _serializer, interceptor);
         }
 
         public TInterface CreateProxy<TInterface>(IClientTransport transport, ITargetNameExtractor nameExtractor = null)

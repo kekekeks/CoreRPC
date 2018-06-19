@@ -1,37 +1,33 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>netcoreapp2.0;net461</TargetFrameworks>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="xunit" Version="2.2.0" />
+    <PackageReference Include="xunit.abstractions" Version="2.0.1" />
+    <PackageReference Include="xunit.assert" Version="2.2.0" />
+    <PackageReference Include="xunit.core" Version="2.2.0" />
+    <PackageReference Include="xunit.extensibility.core" Version="2.2.0" />
+    <PackageReference Include="xunit.extensibility.execution" Version="2.2.0" />
+    <PackageReference Include="xunit.runner.console" Version="2.2.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="1.1.2" />
+    <PackageReference Include="Microsoft.AspNetCore" Version="2.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CoreRPC.AspNetCore\CoreRPC.AspNetCore.csproj" />
+    <ProjectReference Include="..\CoreRPC\CoreRPC.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
+  </ItemGroup>
+  <PropertyGroup>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+  <Target Name="ForceGenerationOfBindingRedirects" AfterTargets="ResolveAssemblyReferences" BeforeTargets="GenerateBindingRedirects" Condition="'$(AutoGenerateBindingRedirects)' == 'true'">
     <PropertyGroup>
-        <TargetFrameworks>netcoreapp2.0;net461</TargetFrameworks>
+      <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
     </PropertyGroup>
-    <ItemGroup>
-        <PackageReference Include="xunit" Version="2.2.0" />
-        <PackageReference Include="xunit.abstractions" Version="2.0.1" />
-        <PackageReference Include="xunit.assert" Version="2.2.0" />
-        <PackageReference Include="xunit.core" Version="2.2.0" />
-        <PackageReference Include="xunit.extensibility.core" Version="2.2.0" />
-        <PackageReference Include="xunit.extensibility.execution" Version="2.2.0" />
-        <PackageReference Include="xunit.runner.console" Version="2.2.0" />
-        <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="1.1.2" />
-        <PackageReference Include="Microsoft.AspNetCore" Version="1.1.2" />
-        <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="1.1.2" />
-    </ItemGroup>
-    <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp1.1'">
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
-    </ItemGroup>
-    <ItemGroup>
-      <ProjectReference Include="..\CoreRPC.AspNetCore\CoreRPC.AspNetCore.csproj" />
-      <ProjectReference Include="..\CoreRPC\CoreRPC.csproj" />
-    </ItemGroup>
-    <ItemGroup>
-      <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
-    </ItemGroup>
-    <PropertyGroup>
-        <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    </PropertyGroup>
-    <Target Name="ForceGenerationOfBindingRedirects" AfterTargets="ResolveAssemblyReferences" BeforeTargets="GenerateBindingRedirects" Condition="'$(AutoGenerateBindingRedirects)' == 'true'">
-        <PropertyGroup>
-           
-            <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
-        </PropertyGroup>
-    </Target>
+  </Target>
 </Project>

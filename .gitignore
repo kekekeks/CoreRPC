@@ -4,3 +4,5 @@
 *.DotSettings.user
 *.user
 .idea
+*.swp
+build

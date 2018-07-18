@@ -74,9 +74,16 @@ namespace CoreRPC
                         result = res;
                     else
                     {
-                        await task;
-                        if (call.Method.ReturnType != typeof (Task))
-                            result = task.GetType().GetProperty("Result")?.GetValue(task);
+                        try
+                        {
+                            await task;
+                            if (call.Method.ReturnType != typeof(Task))
+                                result = task.GetType().GetProperty("Result")?.GetValue(task);
+                        }
+                        catch (Exception e)
+                        {
+                            ex = e;
+                        }
                     }
                 }
             }

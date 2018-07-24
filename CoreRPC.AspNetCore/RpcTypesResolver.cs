@@ -10,9 +10,11 @@ namespace CoreRPC.AspNetCore
 {
     static class RpcTypesResolver
     {
-        public static IEnumerable<Type> GetRpcTypes(IHostingEnvironment env)
+        public static IEnumerable<Type> GetRpcTypes(IHostingEnvironment env) =>
+            GetRpcTypes(Assembly.Load(new AssemblyName(env.ApplicationName)));
+        
+        public static IEnumerable<Type> GetRpcTypes(Assembly entryAssembly)
         {
-            var entryAssembly = Assembly.Load(new AssemblyName(env.ApplicationName));
             var dctx = DependencyContext.Load(entryAssembly);
             foreach (var name in dctx.GetDefaultAssemblyNames())
             {
@@ -26,7 +28,7 @@ namespace CoreRPC.AspNetCore
                     continue;
                 }
                 foreach (var t in asm.DefinedTypes)
-                    if (t.GetCustomAttribute<RegisterRpcAttribute>() != null)
+                    if ((!t.IsAbstract || t.IsInterface) && t.GetCustomAttribute<RegisterRpcAttribute>() != null)
                         yield return t;
             }
         }

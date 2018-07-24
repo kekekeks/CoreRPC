@@ -55,11 +55,15 @@ namespace CoreRPC.AspNetCore
         public static IApplicationBuilder UseCoreRpc(this IApplicationBuilder builder, PathString path,
             Action<CoreRpcAspNetCoreConfiguration> configure = null)
         {
-            var cfg = new CoreRpcAspNetCoreConfiguration();
+            var env = builder.ApplicationServices.GetRequiredService<IHostingEnvironment>();
+            var cfg = new CoreRpcAspNetCoreConfiguration()
+            {
+                RpcTypeResolver = () => RpcTypesResolver.GetRpcTypes(env)
+            };
             configure?.Invoke(cfg);
             var engine = new Engine(new JsonMethodCallSerializer(cfg.JsonSerializer), new DefaultMethodBinder());
-            var env = builder.ApplicationServices.GetRequiredService<IHostingEnvironment>();
-            var types = RpcTypesResolver.GetRpcTypes(env);
+
+            var types = cfg.RpcTypeResolver();
             var extractor = new AspNetCoreTargetNameExtractor();
             var selector = new DefaultTargetSelector(new AspNetCoreTargetFactory(), extractor);
             foreach (var t in types)
@@ -109,5 +113,6 @@ namespace CoreRPC.AspNetCore
             Converters = {new StringEnumConverter()}
         };
         public List<IMethodCallInterceptor> Interceptors { get; } = new List<IMethodCallInterceptor>();
+        public Func<IEnumerable<Type>> RpcTypeResolver { get; set; }
     }
 }

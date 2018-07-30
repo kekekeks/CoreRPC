@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Newtonsoft.Json.Linq;
 
 namespace CoreRPC.Typescript
 {
@@ -62,6 +63,10 @@ namespace CoreRPC.Typescript
             var info = t.GetTypeInfo();
             if (info.IsGenericType && info.GetGenericTypeDefinition() == typeof(Nullable<>))
                 return MapType(Nullable.GetUnderlyingType(t)) + " | null";
+            if (typeof(JToken).IsAssignableFrom(t))
+                return "any";
+            if (t == typeof(object))
+                return "object";
             if (t == typeof(string))
                 return "string";
             if (t == typeof(void))

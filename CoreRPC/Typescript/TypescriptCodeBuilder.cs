@@ -40,7 +40,7 @@ namespace CoreRPC.Typescript
 
         public TypescriptCodeBuilder AppendEnumValue(string name, string value)
         {
-            Pad().Append("    ").Append(name).Append(" = \"").Append(value).AppendLine("\";");
+            Pad().Append("    ").Append(name).Append(" = \"").Append(value).AppendLine("\",");
             return this;
         }
 

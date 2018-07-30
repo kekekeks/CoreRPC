@@ -60,6 +60,13 @@ namespace CoreRPC.Typescript
 
         string MapTypeNameInternal(Type t)
         {
+            var customName = _opts?.CustomTsTypeMapping(t);
+            if (customName != null)
+                return customName;
+            var mappedType = _opts?.CustomTypeMapping(t);
+            if (mappedType != null)
+                return MapType(mappedType);
+            
             var info = t.GetTypeInfo();
             if (info.IsGenericType && info.GetGenericTypeDefinition() == typeof(Nullable<>))
                 return MapType(Nullable.GetUnderlyingType(t)) + " | null";

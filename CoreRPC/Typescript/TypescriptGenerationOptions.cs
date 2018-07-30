@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using CoreRPC.Binding;
 using CoreRPC.Binding.Default;
 using CoreRPC.Routing;
@@ -15,5 +16,7 @@ namespace CoreRPC.Typescript
         public IMethodBinder Binder { get; set; } = new DefaultMethodBinder();
         public ITargetNameExtractor TargetNameExtractor { get; set; } = new DefaultTargetNameExtractor();
         public string ClassName { get; set; } = "CoreApi";
+        public Func<Type, Type> CustomTypeMapping { get; set; } = null;
+        public Func<Type, string> CustomTsTypeMapping { get; set; } = null;
     }
 }

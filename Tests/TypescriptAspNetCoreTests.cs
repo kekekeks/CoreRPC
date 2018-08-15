@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -68,6 +69,18 @@ namespace Tests
     public class NamedRpc
     {
         public int Echo(int num) => num;
+    }
+
+    public class MyGenericDto<T1, T2>
+    {
+        public T1 Prop1 { get; set; }
+        public T2 Prop2 { get; set; }
+    }
+    
+    [RegisterRpc]
+    public class GenericRpcParams
+    {
+        public Dictionary<string, int> Do(MyGenericDto<int, string> dto) => new Dictionary<string, int> {[dto.Prop2] = dto.Prop1};
     }
     
     class RpcStartup

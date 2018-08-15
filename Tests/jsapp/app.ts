@@ -22,9 +22,15 @@ async function work()
         console.error(interceptedRes);
         const namedRes = await api.mySuperName.echo(123);
         console.error(namedRes);
+        const genericRes = await api.genericRpcParams.do({
+            Prop1: 123,
+            Prop2: "321"
+        });
+        console.error(genericRes["321"]);
+        
         if (api1Res === true && api2Res === '3' && api3Res === 'test' 
             && headerRes == 'test-test' && interceptedRes == 'test-test123321'
-            && namedRes == 123)
+            && namedRes == 123 && genericRes["321"] == 123)
             console.log("OK");
     }catch (e) {
         console.error(e);

@@ -25,7 +25,9 @@ namespace CoreRPC.Typescript
         {
             if (_processedTypes.TryGetValue(type, out var name))
                 return name;
+            
             name = _opts.DtoClassNamingPolicy(type);
+            name = name.Split('`')[0];
             if (_usedNames.Contains(name))
                 throw new InvalidProgramException(name + " is already in use");
             _processedTypes[type] = name;
@@ -34,7 +36,14 @@ namespace CoreRPC.Typescript
             var typeInfo = type.GetTypeInfo();
             if (typeInfo.IsInterface || typeInfo.IsClass)
             {
-                code.BeginInterface(type.Name);
+                var tsName = name;
+                if (typeInfo.IsGenericTypeDefinition)
+                {
+                    tsName = name +
+                             "<" + string.Join(",", type.GetGenericArguments().Select(a => a.Name)) + ">";
+                }
+
+                code.BeginInterface(tsName);
                 foreach (var p in type.GetProperties())
                 {
                     var typeName = MapType(p.PropertyType);
@@ -56,10 +65,17 @@ namespace CoreRPC.Typescript
             return name;
         }
 
-
+        string MapGenericType(Type type)
+        {
+            var def = MapComplexType(type.GetGenericTypeDefinition());
+            return def + "<" + string.Join(",", type.GetGenericArguments().Select(MapType)) + ">";
+        }
 
         string MapTypeNameInternal(Type t)
         {
+            if (t.IsGenericParameter)
+                return t.Name;
+            
             var customName = _opts?.CustomTsTypeMapping?.Invoke(t, MapType);
             if (customName != null)
                 return customName;
@@ -100,6 +116,10 @@ namespace CoreRPC.Typescript
             {
                 return MapType(enumerable.GetGenericArguments()[0]) + "[]";
             }
+
+            if (t.IsConstructedGenericType)
+                return MapGenericType(t);
+            
             return MapComplexType(t);
         }
         

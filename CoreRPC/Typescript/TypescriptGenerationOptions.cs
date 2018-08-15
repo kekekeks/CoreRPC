@@ -17,6 +17,8 @@ namespace CoreRPC.Typescript
         public ITargetNameExtractor TargetNameExtractor { get; set; } = new DefaultTargetNameExtractor();
         public string ClassName { get; set; } = "CoreApi";
         public Func<Type, Type> CustomTypeMapping { get; set; } = null;
-        public Func<Type, string> CustomTsTypeMapping { get; set; } = null;
+        public CustomTsTypeMapping CustomTsTypeMapping { get; set; } = null;
     }
+
+    public delegate string CustomTsTypeMapping(Type type, Func<Type, string> subTypeMapper);
 }

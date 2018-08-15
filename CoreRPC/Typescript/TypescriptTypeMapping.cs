@@ -60,7 +60,7 @@ namespace CoreRPC.Typescript
 
         string MapTypeNameInternal(Type t)
         {
-            var customName = _opts?.CustomTsTypeMapping?.Invoke(t);
+            var customName = _opts?.CustomTsTypeMapping?.Invoke(t, MapType);
             if (customName != null)
                 return customName;
             var mappedType = _opts?.CustomTypeMapping?.Invoke(t);

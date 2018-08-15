@@ -85,7 +85,16 @@ namespace CoreRPC.Typescript
                 return "number";
             }
 
-            var enumerable = t.GetInterfaces().Concat(new[] {t}).FirstOrDefault(i =>
+            var allInterfaces = t.GetInterfaces().Concat(new[] {t}).ToList();
+            var dic = allInterfaces.FirstOrDefault(i =>
+                i.IsConstructedGenericType && i.GetGenericTypeDefinition() == typeof(IDictionary<,>));
+            if (dic != null)
+            {
+                var ga = dic.GetGenericArguments().Select(MapType).ToList();
+                return $"{{[key: {ga[0]}] : {ga[1]}}}";
+            }
+            
+            var enumerable = allInterfaces.FirstOrDefault(i =>
                 i.IsConstructedGenericType && i.GetGenericTypeDefinition() == typeof(IEnumerable<>));
             if (enumerable != null)
             {

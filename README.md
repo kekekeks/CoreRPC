@@ -67,7 +67,7 @@ var res = await proxy.Foo(1);
 
 ### Assembly scanning
 
-`CoreRPC.AspNetCore` package supports automatic RPC registration. All you need is marking your class with `RegisterRpc` attribute and it will be registered automatically once you add a call to `.UseCoreRpc` to your `IApplicationBuilder`:
+`CoreRPC.AspNetCore` package supports automatic RPC registration. All you need is marking classes with `RegisterRpc` attribute. Classes marked with that attribute will get registered automatically once you add a call to `.UseCoreRpc()` to your app builder:
 
 ```cs
 // Implement the shared interface.
@@ -80,24 +80,33 @@ public class Service : IService
     }
 }
 
-// It will get registered automatically.
 public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 {
+    // CoreRPC will register the class maked with RegisterRpc 
+    // attribute automagically.
     app.UseCoreRpc("/rpc");
 }
 ```
 
-You can override the built-in assembly scanning engine if necessary:
+You can override the built-in assembly scanning engine and some other options if necessary:
 
 ```cs
 // This may be useful when writing integrational tests, etc.
-app.UseCoreRpc("/rpc", config => config.RpcTypeResolver = () =>
+app.UseCoreRpc("/rpc", config => 
 {
-    // Skip abstract classes and types not marked with [RegisterRpc] (default behavior).
-    var assembly = Assembly.GetAssembly(typeof(Startup));
-    return assembly.DefinedTypes
-        .Where(type => !type.IsAbstract || type.IsInterface && 
-               type.GetCustomAttribute<RegisterRpcAttribute>() != null);
+    // By default, CoreRPC uses camel case resolver, but you can override that.
+    config.JsonSerializer.ContractResolver = new DefaultContractResolver();
+    config.RpcTypeResolver = () =>
+    {
+        // Skip abstract classes and types not marked with [RegisterRpc] (default behavior).
+        var assembly = Assembly.GetAssembly(typeof(Startup));
+        return assembly.DefinedTypes
+            .Where(type => !type.IsAbstract || type.IsInterface && 
+                   type.GetCustomAttribute<RegisterRpcAttribute>() != null);
+    };
+    
+    // You can also add a custom RPC method call interceptor.
+    config.Interceptors.Add(new MyMethodCallInterceptor());
 });
 ```
 

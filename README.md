@@ -17,7 +17,7 @@ public interface IService
 
 ### Server
 
-Implement the declared interface in your server app.
+Implement the declared interface.
 
 ```cs
 public class Service : IService
@@ -67,7 +67,7 @@ var res = await proxy.Foo(1);
 
 ### Assembly scanning
 
-CoreRPC.AspNetCore package supports automatic RPC registration. All you need is to mark your class with `RegisterRpc` attribute and it will be registered automatically once you add a call to `.UseCoreRpc` on your app builder:
+`CoreRPC.AspNetCore` package supports automatic RPC registration. All you need is marking your class with `RegisterRpc` attribute and it will be registered automatically once you add a call to `.UseCoreRpc` to your `IApplicationBuilder`:
 
 ```cs
 // Implement the shared interface.
@@ -100,3 +100,7 @@ app.UseCoreRpc("/rpc", config => config.RpcTypeResolver = () =>
                type.GetCustomAttribute<RegisterRpcAttribute>() != null);
 });
 ```
+
+### Extended usage
+
+CoreRPC also supports [TypeScript client code generation](https://github.com/kekekeks/CoreRPC/blob/master/Tests/TypescriptAspNetCoreTests.cs#L122), [RPC interception](https://github.com/kekekeks/CoreRPC/blob/master/Tests/TypescriptAspNetCoreTests.cs#L118) and more. See [tests](https://github.com/kekekeks/CoreRPC/tree/master/Tests) for more examples.

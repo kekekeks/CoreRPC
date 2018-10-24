@@ -4,7 +4,7 @@ Extensible library for WCF-like RPC targeting netstandard1.3 (compatible with .N
 
 TCP transport supports connection pooling and multiplexing requests within one connection, infrastructure itself allows multiple "services" to be hosted inside one host. You may define your own handler factory or "routing" mechanism. Serializer (JSON.NET is used by default) is also easy to replace.
 
-### Protocol definition
+### Protocol Definition
 
 Put an interface into your shared library and reference it from both client and server apps.
 
@@ -65,7 +65,7 @@ var proxy = new Engine().CreateProxy<IService>(transport);
 var res = await proxy.Foo(1);
 ```
 
-### Assembly scanning
+### Assembly Scanning
 
 `CoreRPC.AspNetCore` package supports automatic RPC registration. All you need is marking classes with `RegisterRpc` attribute. Classes marked with that attribute will get registered automatically once you add a call to `.UseCoreRpc()` to your app builder:
 
@@ -110,6 +110,40 @@ app.UseCoreRpc("/rpc", config =>
 });
 ```
 
-### Extended usage
+### RPC Interception
 
-CoreRPC also supports [TypeScript client code generation](https://github.com/kekekeks/CoreRPC/blob/master/Tests/TypescriptAspNetCoreTests.cs#L122), [RPC interception](https://github.com/kekekeks/CoreRPC/blob/master/Tests/TypescriptAspNetCoreTests.cs#L118) and more. See [tests](https://github.com/kekekeks/CoreRPC/tree/master/Tests) for more examples.
+If you need to intercept RPCs, implement the `IMethodCallInterceptor` interface and register it:
+
+```cs
+// The simplest interceptor that apparently does nothing.
+public class Interceptor : IMethodCallInterceptor
+{
+    public Task<object> Intercept(MethodCall call, object context, Func<Task<object>> invoke)
+    {
+        // Add your custom logic here.
+        return invoke();
+    }
+}
+
+// Register the method call interceptor.
+app.UseCoreRpc("/rpc", config => config.Interceptors.Add(new Interceptor()));
+```
+
+### TypeScript API Generation
+
+CoreRPC provides you an ability to generate TypeScript code for your server-side API.
+
+```cs
+// Store the generated code somewhere, e.g. save it to the 'api.ts' file.
+// Putting such code into your Startup.cs file might be a good idea.
+string generatedCode = AspNetCoreRpcTypescriptGenerator.GenerateCode(types, config =>
+{
+    // Adjust configuration parameters as you wish.
+    config.ApiFieldNamingPolicy = type => type.Replace("Rpc", string.Empty);
+    config.DtoFieldNamingPolicy = TypescriptGenerationOptions.ToCamelCase;
+});
+```
+
+### Usage Examples
+
+See [tests](https://github.com/kekekeks/CoreRPC/tree/master/Tests) for more examples.

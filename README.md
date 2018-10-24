@@ -134,11 +134,10 @@ app.UseCoreRpc("/rpc", config => config.Interceptors.Add(new Interceptor()));
 CoreRPC provides you an ability to generate TypeScript code for your server-side API.
 
 ```cs
-// Store the generated code somewhere, e.g. save it to the 'api.ts' file.
-// Putting such code into your Startup.cs file might be a good idea.
+// Store the generated TS code somewhere, e.g. save it to 'api.ts' file.
+// Putting such C# code into your Startup.cs file might be a good idea.
 string generatedCode = AspNetCoreRpcTypescriptGenerator.GenerateCode(types, config =>
 {
-    // Adjust configuration parameters as you wish.
     config.ApiFieldNamingPolicy = type => type.Replace("Rpc", string.Empty);
     config.DtoFieldNamingPolicy = TypescriptGenerationOptions.ToCamelCase;
 });

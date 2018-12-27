@@ -60,7 +60,7 @@ namespace CoreRPC.CodeGen
                     foreach (var ifaceMethodInfo in iface.GetMethods())
                     {
                         if (!typeof(Task).IsAssignableFrom(ifaceMethodInfo.ReturnType))
-                            throw new ArgumentException(ifaceMethodInfo.Name + "should have Task return type");
+                            throw new ArgumentException(ifaceMethodInfo.Name + " should have Task return type");
 
                         var isVoidReturn = ifaceMethodInfo.ReturnType == typeof(Task);
                         var actualReturnType =

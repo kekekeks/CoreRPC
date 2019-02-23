@@ -15,25 +15,34 @@ namespace CoreRPC.Transport.NamedPipe
         {
             while (!token.IsCancellationRequested)
             {
-                await Task.Run(async () =>
+                var pipe = new NamedPipeServerStream(pipeName, PipeDirection.InOut);
+                try
                 {
-                    using (var pipe = new NamedPipeServerStream(pipeName, PipeDirection.InOut))
-                    {
-                        await pipe.WaitForConnectionAsync(token);
-                        var requestLengthBytes = await pipe.ReadExactlyAsync(4);
-                        var requestLength = BitConverter.ToInt32(requestLengthBytes, 0);
-                        var request = await pipe.ReadExactlyAsync(requestLength);
+                    await pipe.WaitForConnectionAsync(token);
+                    ProcessRequest(pipe, token);
+                }
+                catch (OperationCanceledException)
+                {
+                    pipe.Dispose();
+                }
+            }
+        });
 
-                        var message = new byte[0];
-                        await _engine.HandleRequest(new Request(request, bytes => message = bytes));
+        private void ProcessRequest(NamedPipeServerStream pipe, CancellationToken token) => Task.Run(async () =>
+        {
+            using (pipe)
+            {
+                var requestLengthBytes = await pipe.ReadExactlyAsync(4);
+                var requestLength = BitConverter.ToInt32(requestLengthBytes, 0);
+                var request = await pipe.ReadExactlyAsync(requestLength);
 
-                        var responseLengthBytes = BitConverter.GetBytes(message.Length);
-                        await pipe.WriteAsync(responseLengthBytes, 0, 4, token);
-                        await pipe.WriteAsync(message, 0, message.Length, token);
-                        await pipe.FlushAsync(token);
-                    }
-                },
-                CancellationToken.None);
+                var message = new byte[0];
+                await _engine.HandleRequest(new Request(request, bytes => message = bytes));
+
+                var responseLengthBytes = BitConverter.GetBytes(message.Length);
+                await pipe.WriteAsync(responseLengthBytes, 0, 4, token);
+                await pipe.WriteAsync(message, 0, message.Length, token);
+                await pipe.FlushAsync(token);
             }
         });
 

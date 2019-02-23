@@ -16,7 +16,7 @@ namespace CoreRPC.Transport.NamedPipe
             while (!token.IsCancellationRequested)
             {
                 var pipe = new NamedPipeServerStream(
-                    pipeName, PipeDirection.InOut, 1,
+                    pipeName, PipeDirection.InOut, -1,
                     PipeTransmissionMode.Byte,
                     PipeOptions.Asynchronous);
                 try

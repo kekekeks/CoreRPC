@@ -17,7 +17,7 @@ namespace CoreRPC.Transport.NamedPipe
 
         public async Task<byte[]> SendMessageAsync(byte[] message)
         {
-            using (var pipe = new NamedPipeClientStream(_serverName, _pipeName, PipeDirection.InOut))
+            using (var pipe = new NamedPipeClientStream(_serverName, _pipeName, PipeDirection.InOut, PipeOptions.Asynchronous))
             {
                 await pipe.ConnectAsync();
 

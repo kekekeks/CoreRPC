@@ -19,19 +19,19 @@ namespace CoreRPC.Transport.NamedPipe
             while (!_isDisposed)
             {
                 using (_pipe = new NamedPipeServerStream(pipeName, PipeDirection.InOut))
-                using (var reader = new StreamReader(_pipe))
-                using (var writer = new StreamWriter(_pipe))
+                using (var reader = new BinaryReader(_pipe))
+                using (var writer = new BinaryWriter(_pipe))
                 {
                     await _pipe.WaitForConnectionAsync();
-                    var message = await reader.ReadLineAsync();
-                    var messageBytes = Encoding.UTF8.GetBytes(message);
+                    var length = reader.ReadInt32();
+                    var message = reader.ReadBytes(length);
 
-                    var responseBytes = new byte[0];
-                    await _engine.HandleRequest(new Request(messageBytes, bytes => responseBytes = bytes));
+                    var response = new byte[0];
+                    await _engine.HandleRequest(new Request(message, bytes => response = bytes));
 
-                    var responseString = Encoding.UTF8.GetString(responseBytes);
-                    await writer.WriteLineAsync(responseString);
-                    await writer.FlushAsync();
+                    writer.Write(response.Length);
+                    writer.Write(response);
+                    writer.Flush();
                 }
             }
         });

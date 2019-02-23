@@ -19,17 +19,17 @@ namespace CoreRPC.Transport.NamedPipe
         public async Task<byte[]> SendMessageAsync(byte[] message)
         {
             var pipe = new NamedPipeClientStream(_serverName, _pipeName, PipeDirection.InOut);
-            var messageString = Encoding.UTF8.GetString(message);
-            var writer = new StreamWriter(pipe);
-            var reader = new StreamReader(pipe);
+            var writer = new BinaryWriter(pipe);
+            var reader = new BinaryReader(pipe);
 
             await pipe.ConnectAsync();
-            await writer.WriteLineAsync(messageString);
-            await writer.FlushAsync();
+            writer.Write(message.Length);
+            writer.Write(message);
+            writer.Flush();
 
-            var response = await reader.ReadLineAsync();
-            var responseBytes = Encoding.UTF8.GetBytes(response);
-            return responseBytes;
+            var length = reader.ReadInt32();
+            var response = reader.ReadBytes(length);
+            return response;
         }
     }
 }

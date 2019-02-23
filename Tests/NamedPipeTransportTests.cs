@@ -1,6 +1,5 @@
 ﻿using CoreRPC.Transport.NamedPipe;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using CoreRPC.Transport;
 using Xunit;

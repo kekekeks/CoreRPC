@@ -1,46 +1,38 @@
 ﻿using System;
 using System.IO.Pipes;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace CoreRPC.Transport.NamedPipe
 {
-    public sealed class NamedPipeHost : IDisposable
+    public sealed class NamedPipeHost
     {
         private readonly IRequestHandler _engine;
-        private NamedPipeServerStream _pipe;
-        private bool _isDisposed;
 
         public NamedPipeHost(IRequestHandler engine) => _engine = engine;
 
-        public void StartListening(string pipeName) => Task.Run(async () =>
+        public void StartListening(string pipeName, CancellationToken token) => Task.Run(async () =>
         {
-            while (!_isDisposed)
+            while (!token.IsCancellationRequested)
             {
-                using (_pipe = new NamedPipeServerStream(pipeName, PipeDirection.InOut))
+                using (var pipe = new NamedPipeServerStream(pipeName, PipeDirection.InOut))
                 {
-                    await _pipe.WaitForConnectionAsync();
+                    await pipe.WaitForConnectionAsync(token);
 
-                    var requestLengthBytes = await _pipe.ReadExactlyAsync(4);
+                    var requestLengthBytes = await pipe.ReadExactlyAsync(4);
                     var requestLength = BitConverter.ToInt32(requestLengthBytes, 0);
-                    var request = await _pipe.ReadExactlyAsync(requestLength);
+                    var request = await pipe.ReadExactlyAsync(requestLength);
 
                     var message = new byte[0];
                     await _engine.HandleRequest(new Request(request, bytes => message = bytes));
 
                     var responseLengthBytes = BitConverter.GetBytes(message.Length);
-                    await _pipe.WriteAsync(responseLengthBytes, 0, 4);
-                    await _pipe.WriteAsync(message, 0, message.Length);
-                    await _pipe.FlushAsync();
+                    await pipe.WriteAsync(responseLengthBytes, 0, 4, token);
+                    await pipe.WriteAsync(message, 0, message.Length, token);
+                    await pipe.FlushAsync(token);
                 }
             }
         });
-
-        public void Dispose()
-        {
-            if (_isDisposed) return;
-            _isDisposed = true;
-            _pipe?.Dispose();
-        }
 
         private sealed class Request : IRequest
         {

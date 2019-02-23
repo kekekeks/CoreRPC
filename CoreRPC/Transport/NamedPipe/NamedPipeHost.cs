@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.IO.Pipes;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,29 +15,27 @@ namespace CoreRPC.Transport.NamedPipe
         {
             while (!token.IsCancellationRequested)
             {
-                using (var pipe = new NamedPipeServerStream(pipeName, PipeDirection.InOut))
+                await Task.Run(async () =>
                 {
-                    await pipe.WaitForConnectionAsync(token);
-                    var request = await Task.Run(async () => await ReadResponse(pipe), CancellationToken.None);
+                    using (var pipe = new NamedPipeServerStream(pipeName, PipeDirection.InOut))
+                    {
+                        await pipe.WaitForConnectionAsync(token);
+                        var requestLengthBytes = await pipe.ReadExactlyAsync(4);
+                        var requestLength = BitConverter.ToInt32(requestLengthBytes, 0);
+                        var request = await pipe.ReadExactlyAsync(requestLength);
 
-                    var message = new byte[0];
-                    await _engine.HandleRequest(new Request(request, bytes => message = bytes));
+                        var message = new byte[0];
+                        await _engine.HandleRequest(new Request(request, bytes => message = bytes));
 
-                    var responseLengthBytes = BitConverter.GetBytes(message.Length);
-                    await pipe.WriteAsync(responseLengthBytes, 0, 4, token);
-                    await pipe.WriteAsync(message, 0, message.Length, token);
-                    await pipe.FlushAsync(token);
-                }
+                        var responseLengthBytes = BitConverter.GetBytes(message.Length);
+                        await pipe.WriteAsync(responseLengthBytes, 0, 4, token);
+                        await pipe.WriteAsync(message, 0, message.Length, token);
+                        await pipe.FlushAsync(token);
+                    }
+                },
+                CancellationToken.None);
             }
         });
-
-        private static async Task<byte[]> ReadResponse(Stream stream)
-        {
-            var lengthBytes = await stream.ReadExactlyAsync(4);
-            var length = BitConverter.ToInt32(lengthBytes, 0);
-            var message = await stream.ReadExactlyAsync(length);
-            return message;
-        }
 
         private sealed class Request : IRequest
         {

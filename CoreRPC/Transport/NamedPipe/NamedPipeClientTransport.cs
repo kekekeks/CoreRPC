@@ -17,18 +17,20 @@ namespace CoreRPC.Transport.NamedPipe
 
         public async Task<byte[]> SendMessageAsync(byte[] message)
         {
-            var pipe = new NamedPipeClientStream(_serverName, _pipeName, PipeDirection.InOut);
-            await pipe.ConnectAsync();
-            
-            var requestLengthBytes = BitConverter.GetBytes(message.Length);
-            await pipe.WriteAsync(requestLengthBytes, 0, 4);
-            await pipe.WriteAsync(message, 0, message.Length);
-            await pipe.FlushAsync();
+            using (var pipe = new NamedPipeClientStream(_serverName, _pipeName, PipeDirection.InOut))
+            {
+                await pipe.ConnectAsync();
 
-            var responseLengthBytes = await pipe.ReadExactlyAsync(4);
-            var responseLength = BitConverter.ToInt32(responseLengthBytes, 0);
-            var response = await pipe.ReadExactlyAsync(responseLength);
-            return response;
+                var requestLengthBytes = BitConverter.GetBytes(message.Length);
+                await pipe.WriteAsync(requestLengthBytes, 0, 4);
+                await pipe.WriteAsync(message, 0, message.Length);
+                await pipe.FlushAsync();
+
+                var responseLengthBytes = await pipe.ReadExactlyAsync(4);
+                var responseLength = BitConverter.ToInt32(responseLengthBytes, 0);
+                var response = await pipe.ReadExactlyAsync(responseLength);
+                return response;
+            }
         }
     }
 }

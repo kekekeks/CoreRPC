@@ -12,15 +12,14 @@ namespace Tests
         public async Task CheckConnectivity()
         {
             const string pipe = "NamedPipeTransportTests";
-            using (var server = new NamedPipeHost(new Handler()))
-            {
-                server.StartListening(pipe);
-                var message = new byte[] { 1, 2, 3, 4, 5 };
-                var client = new NamedPipeClientTransport(pipe);
+            var server = new NamedPipeHost(new Handler());
+            
+            server.StartListening(pipe);
+            var message = new byte[] { 1, 2, 3, 4, 5 };
+            var client = new NamedPipeClientTransport(pipe);
 
-                var data = await client.SendMessageAsync(message);
-                Assert.True(data.SequenceEqual(message));
-            }
+            var data = await client.SendMessageAsync(message);
+            Assert.True(data.SequenceEqual(message));
         }
 
         public class Handler : IRequestHandler

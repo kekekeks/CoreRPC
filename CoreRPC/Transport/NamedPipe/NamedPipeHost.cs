@@ -11,7 +11,7 @@ namespace CoreRPC.Transport.NamedPipe
 
         public NamedPipeHost(IRequestHandler engine) => _engine = engine;
 
-        public void StartListening(string pipeName, CancellationToken token) => Task.Run(async () =>
+        public void StartListening(string pipeName, CancellationToken token = default(CancellationToken)) => Task.Run(async () =>
         {
             while (!token.IsCancellationRequested)
             {

@@ -33,13 +33,10 @@ Start your server using either TCP or HTTP protocol.
 
 ```cs
 // TCP
-public void StartServer()
-{
-    var router = new DefaultTargetSelector();
-    router.Register<IService, Service>();
-    var host = new TcpHost(new Engine().CreateRequestHandler(router));
-    host.StartListening(new IPEndPoint(IPAddress.Loopback, 9000));
-}
+var router = new DefaultTargetSelector();
+router.Register<IService, Service>();
+var host = new TcpHost(new Engine().CreateRequestHandler(router));
+host.StartListening(new IPEndPoint(IPAddress.Loopback, 9000));
     
 // ASP.NET Core (HTTP)
 public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -48,6 +45,12 @@ public void Configure(IApplicationBuilder app, IHostingEnvironment env)
     router.Register<IService, Service>();
     app.UseCoreRPC("/rpc", new Engine().CreateRequestHandler(router));
 }
+
+// Named Pipes
+var router = new DefaultTargetSelector();
+router.Register<IService, Service>();
+var host = new NamedPipeHost(new Engine().CreateRequestHandler(router));
+host.StartListening("AwesomePipeName");
 ```
 
 ### Client
@@ -57,12 +60,16 @@ Use the protocol your server uses and call remote procedures!
 ```cs
 // TCP
 var transport = new TcpClientTransport(IPAddress.Parse("127.0.0.1");
-var proxy = new Engine().CreateProxy<IService>(transport, 9000));
+var proxy = new Engine().CreateProxy<IService>(transport, 9000);
 
 // HTTP 
 var transport = new HttpClientTransport("http://example.com/rpc");
 var proxy = new Engine().CreateProxy<IService>(transport);
 var res = await proxy.Foo(1);
+
+// Named Pipes
+var transport = new NamedPipeClientTransport("AwesomePipeName");
+var proxy = new Engine().CreateProxy<IService>(transport);
 ```
 
 ### Assembly Scanning

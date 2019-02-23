@@ -22,12 +22,13 @@ namespace CoreRPC.Transport.NamedPipe
                 try
                 {
                     await pipe.WaitForConnectionAsync(token);
-                    ProcessRequest(pipe, token);
                 }
-                catch (OperationCanceledException)
+                catch
                 {
                     pipe.Dispose();
+                    continue;
                 }
+                ProcessRequest(pipe, token);
             }
         });
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.IO.Pipes;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,10 +19,7 @@ namespace CoreRPC.Transport.NamedPipe
                 using (var pipe = new NamedPipeServerStream(pipeName, PipeDirection.InOut))
                 {
                     await pipe.WaitForConnectionAsync(token);
-
-                    var requestLengthBytes = await pipe.ReadExactlyAsync(4);
-                    var requestLength = BitConverter.ToInt32(requestLengthBytes, 0);
-                    var request = await pipe.ReadExactlyAsync(requestLength);
+                    var request = await Task.Run(async () => await ReadResponse(pipe), CancellationToken.None);
 
                     var message = new byte[0];
                     await _engine.HandleRequest(new Request(request, bytes => message = bytes));
@@ -33,6 +31,14 @@ namespace CoreRPC.Transport.NamedPipe
                 }
             }
         });
+
+        private static async Task<byte[]> ReadResponse(Stream stream)
+        {
+            var lengthBytes = await stream.ReadExactlyAsync(4);
+            var length = BitConverter.ToInt32(lengthBytes, 0);
+            var message = await stream.ReadExactlyAsync(length);
+            return message;
+        }
 
         private sealed class Request : IRequest
         {

@@ -1,7 +1,5 @@
 ﻿using System;
-using System.IO;
 using System.IO.Pipes;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace CoreRPC.Transport.NamedPipe
@@ -19,19 +17,20 @@ namespace CoreRPC.Transport.NamedPipe
             while (!_isDisposed)
             {
                 using (_pipe = new NamedPipeServerStream(pipeName, PipeDirection.InOut))
-                using (var reader = new BinaryReader(_pipe))
-                using (var writer = new BinaryWriter(_pipe))
                 {
                     await _pipe.WaitForConnectionAsync();
-                    var length = reader.ReadInt32();
-                    var message = reader.ReadBytes(length);
 
-                    var response = new byte[0];
-                    await _engine.HandleRequest(new Request(message, bytes => response = bytes));
+                    var requestLengthBytes = await _pipe.ReadExactlyAsync(4);
+                    var requestLength = BitConverter.ToInt32(requestLengthBytes, 0);
+                    var request = await _pipe.ReadExactlyAsync(requestLength);
 
-                    writer.Write(response.Length);
-                    writer.Write(response);
-                    writer.Flush();
+                    var message = new byte[0];
+                    await _engine.HandleRequest(new Request(request, bytes => message = bytes));
+
+                    var responseLengthBytes = BitConverter.GetBytes(message.Length);
+                    await _pipe.WriteAsync(responseLengthBytes, 0, 4);
+                    await _pipe.WriteAsync(message, 0, message.Length);
+                    await _pipe.FlushAsync();
                 }
             }
         });

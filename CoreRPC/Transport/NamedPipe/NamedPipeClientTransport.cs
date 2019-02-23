@@ -1,6 +1,5 @@
-﻿using System.IO;
+﻿using System;
 using System.IO.Pipes;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace CoreRPC.Transport.NamedPipe
@@ -19,16 +18,16 @@ namespace CoreRPC.Transport.NamedPipe
         public async Task<byte[]> SendMessageAsync(byte[] message)
         {
             var pipe = new NamedPipeClientStream(_serverName, _pipeName, PipeDirection.InOut);
-            var writer = new BinaryWriter(pipe);
-            var reader = new BinaryReader(pipe);
-
             await pipe.ConnectAsync();
-            writer.Write(message.Length);
-            writer.Write(message);
-            writer.Flush();
+            
+            var requestLengthBytes = BitConverter.GetBytes(message.Length);
+            await pipe.WriteAsync(requestLengthBytes, 0, 4);
+            await pipe.WriteAsync(message, 0, message.Length);
+            await pipe.FlushAsync();
 
-            var length = reader.ReadInt32();
-            var response = reader.ReadBytes(length);
+            var responseLengthBytes = await pipe.ReadExactlyAsync(4);
+            var responseLength = BitConverter.ToInt32(responseLengthBytes, 0);
+            var response = await pipe.ReadExactlyAsync(responseLength);
             return response;
         }
     }

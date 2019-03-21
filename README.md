@@ -59,7 +59,7 @@ Use the protocol your server uses and call remote procedures!
 
 ```cs
 // TCP
-var transport = new TcpClientTransport(IPAddress.Parse("127.0.0.1");
+var transport = new TcpClientTransport(IPAddress.Parse("127.0.0.1"));
 var proxy = new Engine().CreateProxy<IService>(transport, 9000);
 
 // HTTP 

@@ -20,15 +20,24 @@ namespace CoreRPC.Transport.Http
         {
         }
 
-        public async Task<byte[]> SendMessageAsync(byte[] message)
+        public Task<byte[]> SendMessageAsync(byte[] message)
         {
-            var res = await _client.SendAsync(new HttpRequestMessage(HttpMethod.Post, _url)
+            return _client.SendAsync(new HttpRequestMessage(HttpMethod.Post, _url)
             {
                 Content = new ByteArrayContent(message)
-            });
-            if (!res.IsSuccessStatusCode)
-                throw new Exception("Server returned non-success status code: " + res.StatusCode);
-            return await res.Content.ReadAsByteArrayAsync();
+            }).ContinueWith(ReadByteResponse).Unwrap();
+        }
+
+        // This oddity is needed to avoid catching `byte[] message` in the async state machine
+        // That was causing 6GB resource leak in one of our applications
+        private async Task<byte[]> ReadByteResponse(Task<HttpResponseMessage> t)
+        {
+            using (t.Result)
+            {
+                if (t.Result.IsSuccessStatusCode)
+                    throw new Exception("Server returned non-success status code: " + t.Result.StatusCode);
+                return await t.Result.Content.ReadAsByteArrayAsync();
+            }
         }
     }
 }

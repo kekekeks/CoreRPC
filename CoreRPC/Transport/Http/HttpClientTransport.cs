@@ -6,37 +6,42 @@ using System.Threading.Tasks;
 
 namespace CoreRPC.Transport.Http
 {
-    public class HttpClientTransport : IClientTransport
+    public class HttpClientTransport
     {
-        private readonly HttpClient _client;
+
         private readonly string _url;
-        public HttpClientTransport(HttpClient client, string url)
+
+        public HttpClientTransport( string url)
         {
-            _client = client;
             _url = url;
         }
 
-        public HttpClientTransport(string url) : this(new HttpClient(), url)
-        {
-        }
 
         public Task<byte[]> SendMessageAsync(byte[] message)
         {
-            return _client.SendAsync(new HttpRequestMessage(HttpMethod.Post, _url)
+            var cl = new HttpClient();
+            try
             {
-                Content = new ByteArrayContent(message)
-            }).ContinueWith(ReadByteResponse).Unwrap();
+                return ProcessResponseAsync(cl, cl.SendAsync(new HttpRequestMessage(HttpMethod.Post, this._url)
+                {
+                    Content = new ByteArrayContent(message)
+                }));
+            }
+            catch
+            {
+                cl.Dispose();
+                throw;
+            }
         }
 
-        // This oddity is needed to avoid catching `byte[] message` in the async state machine
-        // That was causing 6GB resource leak in one of our applications
-        private async Task<byte[]> ReadByteResponse(Task<HttpResponseMessage> t)
+        async Task<byte[]> ProcessResponseAsync(HttpClient client, Task<HttpResponseMessage> task)
         {
-            using (t.Result)
+            using (client)
+            using (var res = await task)
             {
-                if (t.Result.IsSuccessStatusCode)
-                    throw new Exception("Server returned non-success status code: " + t.Result.StatusCode);
-                return await t.Result.Content.ReadAsByteArrayAsync();
+                if (!res.IsSuccessStatusCode)
+                    throw new Exception("Server returned non-success status code: " + res.StatusCode);
+                return await res.Content.ReadAsByteArrayAsync();
             }
         }
     }

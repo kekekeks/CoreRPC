@@ -15,6 +15,7 @@ mkdir build
 for d in CoreRPC CoreRPC.AspNetCore
 do
 	cd $DIR/$d
+	rm -rf bin/Release
 	dotnet msbuild /t:Pack /p:Configuration=Release /p:Version=$VERSION
 	cp bin/Release/*.nupkg $DIR/build
 done

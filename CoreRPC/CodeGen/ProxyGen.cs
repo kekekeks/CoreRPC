@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -83,7 +84,7 @@ namespace CoreRPC.CodeGen
                             if (ifaceMethodInfo.GetParameters()[c].ParameterType.GetTypeInfo().IsValueType)
                                 methodIl.Emit (OpCodes.Box, ifaceMethodInfo.GetParameters ()[c].ParameterType);
                             methodIl.Emit(OpCodes.Castclass, typeof(object));
-                            methodIl.Emit(OpCodes.Call, ListAddMethod);
+                            methodIl.Emit(OpCodes.Callvirt, ListAddMethod);
                         }
 
                         var mnfoFieldName = "method_" + ifaceMethodInfo.Name + "_" + Guid.NewGuid().ToString("N");
@@ -100,7 +101,7 @@ namespace CoreRPC.CodeGen
                         var specializedInvoke =
                             ProxyInvoke.MakeGenericMethod(isVoidReturn ? typeof(object) : actualReturnType);
 
-                        methodIl.Emit (OpCodes.Call, specializedInvoke);
+                        methodIl.Emit (OpCodes.Callvirt, specializedInvoke);
 
                         methodIl.Emit(OpCodes.Ret);
 
@@ -114,6 +115,7 @@ namespace CoreRPC.CodeGen
 
             var ctor = type.GetConstructors()[0];
             var arg = Expression.Parameter(typeof (IRealProxy), "proxy");
+            //Generator.DumpCompilationResults();
             return Expression.Lambda<Func<IRealProxy, TInterface>>(Expression.Convert(Expression.New(ctor, arg), typeof (TInterface)), arg).Compile();
         }
     }

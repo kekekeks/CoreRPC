@@ -118,7 +118,7 @@ namespace Tests
             app.UseCoreRpc("/rpc", cfg => cfg.Interceptors.Add(new Interceptor()));
         }
     }
-
+#if !LEGACY_NET
     public class TypescriptAspNetCoreTests
     {
         [Fact]
@@ -155,4 +155,5 @@ namespace Tests
                 throw new Exception(errorTask.Result);
         }
     }
+#endif
 }

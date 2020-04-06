@@ -16,7 +16,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace Tests
 {
-    class AspCoreTests
+    public class AspCoreTests
     {
         class Startup : IRequestHandler
         {
@@ -48,8 +48,8 @@ namespace Tests
             var host = builder.Build();
             host.Start();
             var address = host.ServerFeatures.Get<IServerAddressesFeature>();
-            var addr = address.Addresses.ToString();
-            var transport = new HttpClientTransport(addr+"/rpc");
+            var addr = address.Addresses.First().ToString();
+            var transport = new HttpClientTransport(addr + "/rpc");
             var resp = transport.SendMessageAsync(new byte[] {1, 2}).Result;
             Assert.True(resp.SequenceEqual(new byte[] {2, 1}));
             host.Services.GetService<IApplicationLifetime>().StopApplication();

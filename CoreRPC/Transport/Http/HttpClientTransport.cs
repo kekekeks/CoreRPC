@@ -6,37 +6,32 @@ using System.Threading.Tasks;
 
 namespace CoreRPC.Transport.Http
 {
-    public class HttpClientTransport
+    public class HttpClientTransport : IClientTransport
     {
-
+        private readonly HttpClient _client;
         private readonly string _url;
 
-        public HttpClientTransport( string url)
+        public HttpClientTransport(HttpClient client, string url)
         {
+            _client = client;
             _url = url;
         }
 
+        public HttpClientTransport(string url) : this(new HttpClient(), url)
+        {
+            
+        }
 
         public Task<byte[]> SendMessageAsync(byte[] message)
         {
-            var cl = new HttpClient();
-            try
+            return ProcessResponseAsync(_client.SendAsync(new HttpRequestMessage(HttpMethod.Post, _url)
             {
-                return ProcessResponseAsync(cl, cl.SendAsync(new HttpRequestMessage(HttpMethod.Post, this._url)
-                {
-                    Content = new ByteArrayContent(message)
-                }));
-            }
-            catch
-            {
-                cl.Dispose();
-                throw;
-            }
+                Content = new ByteArrayContent(message)
+            }));
         }
 
-        async Task<byte[]> ProcessResponseAsync(HttpClient client, Task<HttpResponseMessage> task)
+        async Task<byte[]> ProcessResponseAsync(Task<HttpResponseMessage> task)
         {
-            using (client)
             using (var res = await task)
             {
                 if (!res.IsSuccessStatusCode)

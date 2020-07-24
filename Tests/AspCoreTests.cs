@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -36,7 +37,8 @@ namespace Tests
             }
 
 
-            public Task HandleRequest(IRequest req) => req.RespondAsync(req.Data.Reverse().ToArray());
+            public Task HandleRequest(IRequest req) =>
+                req.RespondAsync(req.Data.ReadAsBytes().Reverse().ToArray().AsMemoryStream());
         }
 
         [Fact]
@@ -44,14 +46,15 @@ namespace Tests
         {
             var builder = new WebHostBuilder()
                 .UseKestrel()
+                .UseFreePort()
                 .UseStartup<Startup>();
             var host = builder.Build();
             host.Start();
             var address = host.ServerFeatures.Get<IServerAddressesFeature>();
             var addr = address.Addresses.First().ToString();
             var transport = new HttpClientTransport(addr + "/rpc");
-            var resp = transport.SendMessageAsync(new byte[] {1, 2}).Result;
-            Assert.True(resp.SequenceEqual(new byte[] {2, 1}));
+            var resp = transport.SendMessageAsync(new byte[] {1, 2}.AsMemoryStream()).Result;
+            Assert.True(resp.ReadAsBytes().SequenceEqual(new byte[] {2, 1}));
             host.Services.GetService<IApplicationLifetime>().StopApplication();
         }
 

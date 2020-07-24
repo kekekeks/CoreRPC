@@ -7,6 +7,8 @@ using CoreRPC.Serialization;
 using CoreRPC.Transferable;
 using CoreRPC.Transport;
 using System.Reflection;
+using CoreRPC.Utility;
+using Microsoft.IO;
 
 namespace CoreRPC
 {
@@ -44,7 +46,7 @@ namespace CoreRPC
             MethodCall call = null;
             try
             {
-                call = _serializer.DeserializeCall(new MemoryStream(req.Data), _binder, _selector, req.Context);
+                call = _serializer.DeserializeCall(req.Data, _binder, _selector, req.Context);
             }
             catch (Exception e)
             {
@@ -88,20 +90,23 @@ namespace CoreRPC
                 }
             }
 
-            byte[] response = null;
+            using var response = new RecyclableMemoryStream(StreamPool.Shared);
             if (ex == null)
             {
                 try
                 {
-                    response = Serialize(s => _serializer.SerializeResult(s, result));
+                    _serializer.SerializeResult(response, result);
+                    response.Position = 0;
                 }
                 catch (Exception e)
                 {
                     ex = e;
                 }
             }
+
             if (ex != null)
-                response = Serialize(s => _serializer.SerializeException(s, ex.ToString()));
+                _serializer.SerializeException(response, ex.ToString());
+            
             try
             {
                 await req.RespondAsync(response);
@@ -110,13 +115,6 @@ namespace CoreRPC
             {
                 //TODO: redirect it somewhere?
             }
-        }
-
-        private static byte[] Serialize(Action<MemoryStream> cb)
-        {
-            var ms = new MemoryStream();
-            cb(ms);
-            return ms.ToArray();
         }
 
     }

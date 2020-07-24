@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,9 +13,9 @@ namespace CoreRPC.Transport
 
         private class Request : IRequest
         {
-            private readonly TaskCompletionSource<byte[]> _tcs;
+            private readonly TaskCompletionSource<Stream> _tcs;
 
-            public Request(byte[] data, TaskCompletionSource<byte[]> tcs, object context = null)
+            public Request(Stream data, TaskCompletionSource<Stream> tcs, object context = null)
             {
                 Data = data;
                 Context = context;
@@ -23,13 +24,13 @@ namespace CoreRPC.Transport
 
             public object Context { get; }
 
-            public Task RespondAsync(byte[] data)
+            public Task RespondAsync(Stream data)
             {
                 _tcs.SetResult(data);
                 return Task.FromResult(0);
             }
 
-            public byte[] Data { get; private set; }
+            public Stream Data { get; private set; }
         }
 
         public GenericHost(IRequestHandler handler)
@@ -37,9 +38,9 @@ namespace CoreRPC.Transport
             _handler = handler;
         }
 
-        public Task<byte[]> HandleRequest(byte[] data)
+        public Task<Stream> HandleRequest(Stream data)
         {
-            var tcs = new TaskCompletionSource<byte[]>();
+            var tcs = new TaskCompletionSource<Stream>();
             _handler.HandleRequest(new Request(data, tcs));
             return tcs.Task;
         }

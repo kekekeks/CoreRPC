@@ -1,7 +1,10 @@
 ﻿using System;
+using System.IO;
 using System.IO.Pipes;
 using System.Threading;
 using System.Threading.Tasks;
+using CoreRPC.Utility;
+using Microsoft.IO;
 
 namespace CoreRPC.Transport.NamedPipe
 {
@@ -38,37 +41,41 @@ namespace CoreRPC.Transport.NamedPipe
             {
                 var requestLengthBytes = await pipe.ReadExactlyAsync(4);
                 var requestLength = BitConverter.ToInt32(requestLengthBytes, 0);
-                var request = await pipe.ReadExactlyAsync(requestLength);
+                Stream response = null;
+                using (var request = new RecyclableMemoryStream(StreamPool.Shared))
+                {
+                    await pipe.ReadExactlyAsync(request, requestLength);
+                    request.Position = 0;
 
-                var message = new byte[0];
-                await _engine.HandleRequest(new Request(request, bytes => message = bytes));
+                    await _engine.HandleRequest(new Request(request, async response =>
+                    {
+                        var responseLengthBytes = BitConverter.GetBytes(response.Length);
+                        await pipe.WriteAsync(responseLengthBytes, 0, 4, token);
+                        await response.CopyToAsync(pipe, 81920, token);
+                        await pipe.FlushAsync(token);
+                    }));
+                }
 
-                var responseLengthBytes = BitConverter.GetBytes(message.Length);
-                await pipe.WriteAsync(responseLengthBytes, 0, 4, token);
-                await pipe.WriteAsync(message, 0, message.Length, token);
-                await pipe.FlushAsync(token);
+                
+                
             }
         });
 
         private sealed class Request : IRequest
         {
-            private readonly Action<byte[]> _respond;
+            private readonly Func<Stream, Task> _respond;
 
-            public Request(byte[] data, Action<byte[]> respond)
+            public Request(Stream data, Func<Stream, Task> respond)
             {
                 Data = data;
                 _respond = respond;
             }
 
-            public byte[] Data { get; }
+            public Stream Data { get; }
 
             public object Context { get; } = null;
 
-            public Task RespondAsync(byte[] data)
-            {
-                _respond(data);
-                return Task.CompletedTask;
-            }
+            public Task RespondAsync(Stream data) => _respond(data);
         }
     }
 }

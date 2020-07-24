@@ -1,6 +1,9 @@
 ﻿using System;
+using System.IO;
 using System.IO.Pipes;
 using System.Threading.Tasks;
+using CoreRPC.Utility;
+using Microsoft.IO;
 
 namespace CoreRPC.Transport.NamedPipe
 {
@@ -15,7 +18,8 @@ namespace CoreRPC.Transport.NamedPipe
             _pipeName = pipeName;
         }
 
-        public async Task<byte[]> SendMessageAsync(byte[] message)
+        
+        public async Task<Stream> SendMessageAsync(Stream message)
         {
             using (var pipe = new NamedPipeClientStream(_serverName, _pipeName, PipeDirection.InOut, PipeOptions.Asynchronous))
             {
@@ -23,13 +27,27 @@ namespace CoreRPC.Transport.NamedPipe
 
                 var requestLengthBytes = BitConverter.GetBytes(message.Length);
                 await pipe.WriteAsync(requestLengthBytes, 0, 4);
-                await pipe.WriteAsync(message, 0, message.Length);
+                await message.CopyToAsync(pipe);
                 await pipe.FlushAsync();
 
                 var responseLengthBytes = await pipe.ReadExactlyAsync(4);
                 var responseLength = BitConverter.ToInt32(responseLengthBytes, 0);
-                var response = await pipe.ReadExactlyAsync(responseLength);
-                return response;
+
+                bool success = false;
+                var ms = new RecyclableMemoryStream(StreamPool.Shared);
+                try
+                {
+                    await pipe.ReadExactlyAsync(ms, responseLength);
+                    ms.Position = 0;
+                    success = true;
+                }
+                finally
+                {
+                    if(!success)
+                        ms.Dispose();
+                }
+
+                return ms;
             }
         }
     }

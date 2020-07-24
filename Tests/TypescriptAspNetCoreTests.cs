@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using CoreRPC;
@@ -129,8 +131,10 @@ namespace Tests
             while (!Directory.Exists(jsDir = Path.Combine(dir, "jsapp")))
                 dir = Path.GetFullPath(Path.Combine(dir, ".."));
             RpcStartup.JsDir = jsDir;
+
             var builder = new WebHostBuilder()
                 .UseKestrel()
+                .UseFreePort()
                 .UseStartup<RpcStartup>();
             var host = builder.Build();
             host.Start();

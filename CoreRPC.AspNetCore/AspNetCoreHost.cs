@@ -25,22 +25,20 @@ namespace CoreRPC.AspNetCore
         {
             private readonly HttpContext _ctx;
 
-            public Request(HttpContext ctx, byte[] data)
+            public Request(HttpContext ctx, Stream data)
             {
                 _ctx = ctx;
                 Data = data;
             }
-            public byte[] Data { get; }
+            public Stream Data { get; }
             public object Context => _ctx;
 
-            public Task RespondAsync(byte[] data) => _ctx.Response.Body.WriteAsync(data, 0, data.Length);
+            public Task RespondAsync(Stream data) => data.CopyToAsync(_ctx.Response.Body);
         }
 
         static async Task Handle(HttpContext context, IRequestHandler handler)
         {
-            var ms = new MemoryStream();
-            await context.Request.Body.CopyToAsync(ms);
-            await handler.HandleRequest(new Request(context, ms.ToArray()));
+            await handler.HandleRequest(new Request(context, context.Request.Body));
         }
 
         public static IApplicationBuilder UseCoreRpc(this IApplicationBuilder builder, PathString path,

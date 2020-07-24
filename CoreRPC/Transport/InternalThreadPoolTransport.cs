@@ -1,5 +1,8 @@
-﻿using System.Threading;
+﻿using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
+using CoreRPC.Utility;
+using Microsoft.IO;
 
 namespace CoreRPC.Transport
 {
@@ -14,26 +17,28 @@ namespace CoreRPC.Transport
 
         class Request : IRequest
         {
-            private readonly TaskCompletionSource<byte[]> _tcs;
+            private readonly TaskCompletionSource<Stream> _tcs;
 
-            public Request(TaskCompletionSource<byte[]> tcs, byte[] data)
+            public Request(TaskCompletionSource<Stream> tcs, Stream data)
             {
                 _tcs = tcs;
                 Data = data;
             }
 
-            public byte[] Data { get; private set; }
+            public Stream Data { get; private set; }
             public object Context { get; } = null;
-            public Task RespondAsync(byte[] data)
+            public async Task RespondAsync(Stream data)
             {
-                _tcs.SetResult(data);
-                return Task.Run(() => { });
+                var ms = new RecyclableMemoryStream(StreamPool.Shared);
+                await data.CopyToAsync(ms);
+                ms.Position = 0;
+                _tcs.SetResult(ms);
             }
         }
 
-        public Task<byte[]> SendMessageAsync(byte[] message)
+        public Task<Stream> SendMessageAsync(Stream message)
         {
-            var tcs = new TaskCompletionSource<byte[]>();
+            var tcs = new TaskCompletionSource<Stream>();
             Task.Run(() => _engine.HandleRequest(new Request(tcs, message)));
             return tcs.Task;
         }

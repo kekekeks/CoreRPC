@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,21 +23,30 @@ namespace CoreRPC.Transport.Http
             
         }
 
-        public Task<byte[]> SendMessageAsync(byte[] message)
+        public Task<Stream> SendMessageAsync(Stream message)
         {
             return ProcessResponseAsync(_client.SendAsync(new HttpRequestMessage(HttpMethod.Post, _url)
             {
-                Content = new ByteArrayContent(message)
+                Content = new StreamContent(message)
             }));
         }
 
-        async Task<byte[]> ProcessResponseAsync(Task<HttpResponseMessage> task)
+        async Task<Stream> ProcessResponseAsync(Task<HttpResponseMessage> task)
         {
-            using (var res = await task)
+            var res = await task;
+            var success = false;
+            try
             {
                 if (!res.IsSuccessStatusCode)
                     throw new Exception("Server returned non-success status code: " + res.StatusCode);
-                return await res.Content.ReadAsByteArrayAsync();
+                var rv = await res.Content.ReadAsStreamAsync();
+                success = true;
+                return rv;
+            }
+            finally
+            {
+                if(!success)
+                    res.Dispose();
             }
         }
     }

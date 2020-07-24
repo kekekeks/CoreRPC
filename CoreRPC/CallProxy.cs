@@ -13,6 +13,7 @@ using CoreRPC.Serialization;
 using CoreRPC.Transferable;
 using CoreRPC.Transport;
 using CoreRPC.Utility;
+using Microsoft.IO;
 
 namespace CoreRPC
 {
@@ -33,22 +34,23 @@ namespace CoreRPC
 
         public async Task<T> Invoke<T>(MethodInfo method, IEnumerable args)
         {
-            var ms = new MemoryStream();
+            using var ms = new RecyclableMemoryStream(StreamPool.Shared);
             _serializer.SerializeCall(ms, _binder, _targetName, new MethodCall
                 {
                     Method = method,
                     Arguments = args.Cast<object>().ToArray()
                 });
-            var res = await SendAndParseResponse(ms.ToArray(), typeof(T));
+            ms.Position = 0;
+            var res = await SendAndParseResponse(ms, typeof(T));
             if(res.Exception != null)
                 throw new Exception(res.Exception);
             return (T) res.Result;
         }
 
-        async Task<MethodCallResult> SendAndParseResponse(byte[] data, Type expectedType)
+        async Task<MethodCallResult> SendAndParseResponse(Stream data, Type expectedType)
         {
-            var resp = new MemoryStream(await _transport.SendMessageAsync(data));
-            return _serializer.DeserializeResult(resp, expectedType);
+            using (var resp = await _transport.SendMessageAsync(data))
+                return _serializer.DeserializeResult(resp, expectedType);
         }
     }
 }

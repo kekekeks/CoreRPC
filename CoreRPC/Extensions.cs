@@ -23,6 +23,19 @@ namespace CoreRPC
             }
             return ms.ToArray();
         }
+        
+        public static async Task ReadExactlyAsync(this Stream stream, Stream target, int size)
+        {
+            var buffer = new byte[8192];
+            while (size > 0)
+            {
+                var read = await stream.ReadAsync(buffer, 0, Math.Min(size, buffer.Length));
+                if (read == 0)
+                    throw new EndOfStreamException();
+                await target.WriteAsync(buffer, 0, read);
+                size -= read;
+            }
+        }
 
 
     }

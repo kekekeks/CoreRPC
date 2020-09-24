@@ -56,9 +56,9 @@ namespace CoreRPC.Typescript
             return this;
         }
 
-        public TypescriptCodeBuilder BeginMethod(string name, bool @public = true)
+        public TypescriptCodeBuilder BeginMethod(string name, bool? @public = true)
         {
-            Pad().Append(@public ? "public " : "private ").Append(name).Append(" (");
+            Pad().Append(@public.HasValue ? (@public.Value ? "public " : "private ") : "").Append(name).Append(" (");
             _methodHadParameters = false;
             return this;
         }
@@ -73,11 +73,28 @@ namespace CoreRPC.Typescript
             return this;
         }
 
-        public TypescriptCodeBuilder AppendMethodReturnValueAndBeginBody(string type)
+        public TypescriptCodeBuilder AppendMethodReturnValue(string type)
         {
-            _builder.Append(") : ").Append(type).AppendLine("{");
+            _builder.Append(") : ").Append(type);
+            return this;
+        }
+
+        public TypescriptCodeBuilder AppendSemicolon()
+        {
+            _builder.AppendLine(";");
+            return this;
+        }
+
+        public TypescriptCodeBuilder BeginBody()
+        {
+            AppendLine("{");
             _level++;
             return this;
+        }
+        
+        public TypescriptCodeBuilder AppendMethodReturnValueAndBeginBody(string type)
+        {
+            return AppendMethodReturnValue(type).BeginBody();
         }
     }
 }

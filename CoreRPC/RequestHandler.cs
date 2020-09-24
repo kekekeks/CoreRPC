@@ -105,8 +105,13 @@ namespace CoreRPC
             }
 
             if (ex != null)
+            {
+                response.Position = 0;
+                response.SetLength(0);
                 _serializer.SerializeException(response, ex.ToString());
-            
+                
+            }
+
             try
             {
                 await req.RespondAsync(response);

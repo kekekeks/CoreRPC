@@ -46,7 +46,16 @@ namespace CoreRPC
             MethodCall call = null;
             try
             {
-                call = _serializer.DeserializeCall(req.Data, _binder, _selector, req.Context);
+                if (req.Data is RecyclableMemoryStream || req.Data is MemoryStream)
+                    call = _serializer.DeserializeCall(req.Data, _binder, _selector, req.Context);
+                else
+                {
+                    using var copy = new RecyclableMemoryStream(StreamPool.Shared);
+                    await req.Data.CopyToAsync(copy);
+                    req.Data.Dispose();
+                    copy.Position = 0;
+                    call = _serializer.DeserializeCall(copy, _binder, _selector, req.Context);
+                }
             }
             catch (Exception e)
             {

@@ -118,7 +118,7 @@ namespace CoreRPC
                 response.Position = 0;
                 response.SetLength(0);
                 _serializer.SerializeException(response, ex.ToString());
-                
+                response.Position = 0;
             }
 
             try

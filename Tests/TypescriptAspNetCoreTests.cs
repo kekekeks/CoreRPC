@@ -84,6 +84,18 @@ namespace Tests
     {
         public Dictionary<string, int> Do(MyGenericDto<int, string> dto) => new Dictionary<string, int> {[dto.Prop2] = dto.Prop1};
     }
+
+    public class MyStaticFieldsDto
+    {
+        public string RegularProperty { get; set; } = "Foo";
+        public static string StaticPropertyThisTextShouldNotExistInGeneratedFile { get; set; } = "I'm a static.";
+    }
+
+    [RegisterRpc]
+    public class StaticFields
+    {
+        public MyStaticFieldsDto Do() => new MyStaticFieldsDto();
+    }
     
     class RpcStartup
     {
@@ -157,6 +169,10 @@ namespace Tests
             var output = outputTask.Result;
             if (output.Trim() != "OK")
                 throw new Exception(errorTask.Result);
+
+            var apiTs = Path.Combine(jsDir, "api.ts");
+            var generatedStuff = File.ReadAllText(apiTs);
+            Assert.DoesNotContain("ThisTextShouldNotExistInGeneratedFile", generatedStuff);
         }
     }
 #endif

@@ -46,6 +46,9 @@ namespace CoreRPC.Typescript
                 code.BeginInterface(tsName);
                 foreach (var p in type.GetProperties())
                 {
+                    if (p.GetAccessors(false).Any(x => x.IsStatic))
+                        continue;
+
                     var typeName = MapType(p.PropertyType);
                     code.AppendInterfaceProperty(_opts.DtoFieldNamingPolicy(p.Name), typeName);
                 }

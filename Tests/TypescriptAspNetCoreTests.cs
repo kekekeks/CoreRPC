@@ -88,7 +88,7 @@ namespace Tests
     public class MyStaticFieldsDto
     {
         public string RegularProperty { get; set; } = "Foo";
-        public static string StaticProperty { get; set; } = "I'm a static property and should be stripped away.";
+        public static string StaticPropertyThisTextShouldNotExistInGeneratedFile { get; set; } = "I'm a static.";
     }
 
     [RegisterRpc]
@@ -169,6 +169,10 @@ namespace Tests
             var output = outputTask.Result;
             if (output.Trim() != "OK")
                 throw new Exception(errorTask.Result);
+
+            var apiTs = Path.Combine(jsDir, "api.ts");
+            var generatedStuff = File.ReadAllText(apiTs);
+            Assert.DoesNotContain("ThisTextShouldNotExistInGeneratedFile", generatedStuff);
         }
     }
 #endif

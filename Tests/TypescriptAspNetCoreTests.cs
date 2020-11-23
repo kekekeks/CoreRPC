@@ -84,6 +84,18 @@ namespace Tests
     {
         public Dictionary<string, int> Do(MyGenericDto<int, string> dto) => new Dictionary<string, int> {[dto.Prop2] = dto.Prop1};
     }
+
+    public class MyStaticFieldsDto
+    {
+        public string RegularProperty { get; set; } = "Foo";
+        public static string StaticProperty { get; set; } = "I'm a static property and should be stripped away.";
+    }
+
+    [RegisterRpc]
+    public class StaticFields
+    {
+        public MyStaticFieldsDto Do() => new MyStaticFieldsDto();
+    }
     
     class RpcStartup
     {

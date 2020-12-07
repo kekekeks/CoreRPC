@@ -87,7 +87,7 @@ namespace Tests
 
     public class MyStaticFieldsDto
     {
-        public string RegularProperty { get; set; } = "Foo";
+        public string MyStaticFieldsDtoRegularProperty { get; set; } = "Foo";
         public static string StaticPropertyThisTextShouldNotExistInGeneratedFile { get; set; } = "I'm a static.";
     }
 
@@ -96,7 +96,24 @@ namespace Tests
     {
         public MyStaticFieldsDto Do() => new MyStaticFieldsDto();
     }
-    
+
+    public class MyTsIgnoreDto
+    {
+        public string MyTsIgnoreDtoRegularProperty { get; set; } = "Foo";
+
+        [TsIgnore]
+        public string ThisTextShouldNotExistInGeneratedFile { get; set; } = "I'm ignored.";
+
+        [TsIgnore]
+        public string ComputedThisTextShouldNotExistInGeneratedFile => "I'm computed.";
+    }
+
+    [RegisterRpc]
+    public class TsIgnoreProperties
+    {
+        public MyTsIgnoreDto Do() => new MyTsIgnoreDto();
+    }
+
     class RpcStartup
     {
         public static string JsDir;
@@ -172,6 +189,8 @@ namespace Tests
 
             var apiTs = Path.Combine(jsDir, "api.ts");
             var generatedStuff = File.ReadAllText(apiTs);
+            Assert.Contains(nameof(MyStaticFieldsDto.MyStaticFieldsDtoRegularProperty), generatedStuff);
+            Assert.Contains(nameof(MyTsIgnoreDto.MyTsIgnoreDtoRegularProperty), generatedStuff);
             Assert.DoesNotContain("ThisTextShouldNotExistInGeneratedFile", generatedStuff);
         }
     }

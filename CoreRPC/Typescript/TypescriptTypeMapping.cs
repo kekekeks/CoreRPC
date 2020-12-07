@@ -49,6 +49,9 @@ namespace CoreRPC.Typescript
                     if (p.GetAccessors(false).Any(x => x.IsStatic))
                         continue;
 
+                    if (Attribute.IsDefined(p, typeof(TsIgnoreAttribute)))
+                        continue;
+
                     var typeName = MapType(p.PropertyType);
                     code.AppendInterfaceProperty(_opts.DtoFieldNamingPolicy(p.Name), typeName);
                 }

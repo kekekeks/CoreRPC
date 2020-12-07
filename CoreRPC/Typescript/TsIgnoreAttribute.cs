@@ -1,6 +1,6 @@
 using System;
 
-namespace CoreRPC
+namespace CoreRPC.Typescript
 {
     [AttributeUsage(AttributeTargets.Property)]
     public class TsIgnoreAttribute : Attribute

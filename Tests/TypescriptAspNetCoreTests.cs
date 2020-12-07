@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using CoreRPC;
 using CoreRPC.AspNetCore;
 using CoreRPC.Transferable;
+using CoreRPC.Typescript;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server.Features;

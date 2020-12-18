@@ -2,9 +2,21 @@
 
 # CoreRPC
 
-Extensible library for WCF-like RPC targeting netstandard1.3 (compatible with .NET, Mono and .NET Core)
+Extensible library for WCF-like RPC targeting netstandard1.3 (compatible with .NET, .NET Framework, Mono and .NET Core). TCP transport supports connection pooling and multiplexing requests within one connection, infrastructure itself allows multiple "services" to be hosted inside one host. You may define your own handler factory or "routing" mechanism. Serializer (JSON.NET is used by default) is also easy to replace.
 
-TCP transport supports connection pooling and multiplexing requests within one connection, infrastructure itself allows multiple "services" to be hosted inside one host. You may define your own handler factory or "routing" mechanism. Serializer (JSON.NET is used by default) is also easy to replace.
+## NuGet Packages
+
+Install the following package into your projects.
+
+| Target             | CoreRPC Package                 | NuGet                |
+| ------------------ | ------------------------------- | -------------------- |
+| Standalone         | [CoreRPC][CorePkg]              | [![CoreBadge]][CorePkg] |
+| ASP .NET Core      | [CoreRPC.AspNetCore][AspPkg]    | [![AspBadge]][AspPkg] |
+
+[CoreBadge]: https://img.shields.io/nuget/v/CoreRpc.svg
+[CorePkg]: https://www.nuget.org/packages/CoreRpc
+[AspBadge]: https://img.shields.io/nuget/v/CoreRpc.AspNetCore.svg
+[AspPkg]: https://www.nuget.org/packages/CoreRpc.AspNetCore
 
 ### Protocol Definition
 

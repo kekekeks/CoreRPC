@@ -1,3 +1,5 @@
+[![NuGet Stats](https://img.shields.io/nuget/v/CoreRpc.svg)](https://www.nuget.org/packages/CoreRpc) [![Downloads](https://img.shields.io/nuget/dt/corerpc.svg)](https://www.nuget.org/packages/corerpc) ![License](https://img.shields.io/github/license/kekekeks/corerpc.svg)
+
 # CoreRPC
 
 Extensible library for WCF-like RPC targeting netstandard1.3 (compatible with .NET, Mono and .NET Core)
@@ -6,7 +8,7 @@ TCP transport supports connection pooling and multiplexing requests within one c
 
 ### Protocol Definition
 
-Put an interface into your shared library and reference it from both client and server apps.
+Put an interface into your shared library and reference it from both client and server apps:
 
 ```cs
 public interface IService
@@ -15,9 +17,9 @@ public interface IService
 }
 ```
 
-### Server
+### Server App
 
-Implement the declared interface.
+Implement the declared interface:
 
 ```cs
 public class Service : IService
@@ -29,52 +31,42 @@ public class Service : IService
 }
 ```
 
-Start your server using either TCP or HTTP protocol.
+Configure the router and start your server using either TCP, HTTP, or Named Pipes:
 
 ```cs
-// TCP
+// Configure the router.
 var router = new DefaultTargetSelector();
 router.Register<IService, Service>();
-var host = new TcpHost(new Engine().CreateRequestHandler(router));
-host.StartListening(new IPEndPoint(IPAddress.Loopback, 9000));
-    
-// ASP.NET Core (HTTP)
-public void Configure(IApplicationBuilder app, IHostingEnvironment env)
-{
-    var router = new DefaultTargetSelector();
-    router.Register<IService, Service>();
-    app.UseCoreRPC("/rpc", new Engine().CreateRequestHandler(router));
-}
+var engine = new Engine().CreateRequestHandler(router);
 
-// Named Pipes
-var router = new DefaultTargetSelector();
-router.Register<IService, Service>();
-var host = new NamedPipeHost(new Engine().CreateRequestHandler(router));
-host.StartListening("AwesomePipeName");
+// Use Named Pipes.
+new NamedPipeHost(engine).StartListening("AwesomePipeName");
+
+// Or, use HTTP (ASP.NET Core).
+public void Configure(IApplicationBuilder app, IHostingEnvironment env) {
+    app.UseCoreRPC("/rpc", engine);
+}
 ```
 
-### Client
+### Client App
 
-Use the protocol your server uses and call remote procedures!
+Use the protocol your server uses, and call remote procedures!
 
 ```cs
-// TCP
-var transport = new TcpClientTransport(IPAddress.Parse("127.0.0.1"));
-var proxy = new Engine().CreateProxy<IService>(transport, 9000);
-
-// HTTP 
+// Use HTTP. 
 var transport = new HttpClientTransport("http://example.com/rpc");
+
+// Or, use Named Pipes.
+var transport = new NamedPipeClientTransport("AwesomePipeName");
+
+// Crete the proxy and call remote procedures!
 var proxy = new Engine().CreateProxy<IService>(transport);
 var res = await proxy.Foo(1);
-
-// Named Pipes
-var transport = new NamedPipeClientTransport("AwesomePipeName");
-var proxy = new Engine().CreateProxy<IService>(transport);
 ```
 
-### Assembly Scanning
+## Assembly Scanning
 
-`CoreRPC.AspNetCore` package supports automatic RPC registration. All you need is marking classes with `RegisterRpc` attribute. Classes marked with that attribute will get registered automatically once you add a call to `.UseCoreRpc()` to your app builder:
+`CoreRPC.AspNetCore` package supports automatic RPC registration. All you need is to mark your classes with the `RegisterRpc` attribute. CoreRPC will discover and register classes marked with that attribute automatically once you add a call to `.UseCoreRpc()` to your app builder:
 
 ```cs
 // Implement the shared interface.
@@ -89,13 +81,12 @@ public class Service : IService
 
 public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 {
-    // CoreRPC will register the class maked with RegisterRpc 
-    // attribute automagically.
+    // CoreRPC will register the class maked with RegisterRpc automatically.
     app.UseCoreRpc("/rpc");
 }
 ```
 
-You can override the built-in assembly scanning engine and some other options if necessary:
+You can override the built-in assembly scanning engine and a few other options if necessary:
 
 ```cs
 // This may be useful when writing integrational tests, etc.
@@ -117,7 +108,7 @@ app.UseCoreRpc("/rpc", config =>
 });
 ```
 
-### RPC Interception
+## RPC Interception
 
 If you need to intercept RPCs, implement the `IMethodCallInterceptor` interface and register it:
 
@@ -136,7 +127,7 @@ public class Interceptor : IMethodCallInterceptor
 app.UseCoreRpc("/rpc", config => config.Interceptors.Add(new Interceptor()));
 ```
 
-### TypeScript API Generation
+## TypeScript API Generation
 
 CoreRPC provides you an ability to generate TypeScript code for your server-side API.
 
@@ -150,6 +141,6 @@ string generatedCode = AspNetCoreRpcTypescriptGenerator.GenerateCode(types, conf
 });
 ```
 
-### Usage Examples
+## Usage Examples
 
 See [tests](https://github.com/kekekeks/CoreRPC/tree/master/Tests) for more examples.

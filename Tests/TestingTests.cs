@@ -52,7 +52,7 @@ namespace Tests
 
             public int Multiply(int a, int b) => _service.Multiply(a, b);
 
-            public Task<object> OnExecuteRpcCall(HttpContext context, Func<Task<object>> action)
+            Task<object> IHttpContextAwareRpc.OnExecuteRpcCall(HttpContext context, Func<Task<object>> action)
             {
                 var header = context.Request.Headers["X-Auth"].FirstOrDefault();
                 if (header != null && header == SecureToken)
@@ -92,6 +92,14 @@ namespace Tests
             public IRpcExec<SecureComputeRpc> Compute => Get<SecureComputeRpc>();
         }
 
+        // This RPC will unable to access secure APIs, because no header is provided.
+        public sealed class InSecureRpcList : RpcListBase
+        {
+            public InSecureRpcList(string uri) : base(uri) { }
+
+            public IRpcExec<SecureComputeRpc> Compute => Get<SecureComputeRpc>();
+        }
+
         [Theory]
         [InlineData(1, 1, 2, 1)]
         [InlineData(2, 2, 4, 4)]
@@ -116,6 +124,24 @@ namespace Tests
             var secure = new SecureRpcList(address);
             Assert.Equal(sum, secure.Compute.Call(api => api.Sum(a, b)));
             Assert.Equal(product, secure.Compute.Call(api => api.Multiply(a, b)));
+        }
+
+        [Fact]
+        public async Task InSecureProcedureCallsShouldFail()
+        {
+            var host = new WebHostBuilder()
+                .UseKestrel()
+                .UseFreePort()
+                .UseStartup<Startup>()
+                .Build();
+
+            await host.StartAsync();
+            var addresses = host.ServerFeatures.Get<IServerAddressesFeature>();
+            var address = addresses.Addresses.First().TrimEnd('/') + "/rpc";
+
+            var insecure = new InSecureRpcList(address);
+            Assert.ThrowsAny<Exception>(() => insecure.Compute.Call(api => api.Sum(2, 2)));
+            Assert.ThrowsAny<Exception>(() => insecure.Compute.Call(api => api.Multiply(2, 2)));
         }
     }
 }

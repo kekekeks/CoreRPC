@@ -23,7 +23,7 @@ namespace CoreRPC.Testing
 
         protected RpcListBase(
             string uri,
-            Dictionary<string, string> headers,
+            Dictionary<string, string> headers = null,
             HttpClient http = null,
             JsonSerializerSettings settings = null)
         {

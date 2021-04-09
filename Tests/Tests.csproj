@@ -21,6 +21,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CoreRPC.AspNetCore\CoreRPC.AspNetCore.csproj" />
+    <ProjectReference Include="..\CoreRPC.Testing\CoreRPC.Testing.csproj" />
     <ProjectReference Include="..\CoreRPC\CoreRPC.csproj" />
   </ItemGroup>
   <ItemGroup>

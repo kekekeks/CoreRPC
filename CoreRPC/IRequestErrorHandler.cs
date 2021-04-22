@@ -4,6 +4,6 @@ namespace CoreRPC
 {
     public interface IRequestErrorHandler
     {
-        void HandleError(Exception exception);
+        string HandleError(Exception exception);
     }
 }

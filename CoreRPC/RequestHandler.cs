@@ -124,8 +124,8 @@ namespace CoreRPC
                 {
                     try
                     {
-                        _errors.HandleError(ex);
-                        SerializeError(response, "500");
+                        var handled = _errors.HandleError(ex);
+                        SerializeError(response, handled ?? "Internal Server Error");
                     }
                     catch
                     {

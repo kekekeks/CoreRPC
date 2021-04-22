@@ -66,7 +66,8 @@ namespace CoreRPC.AspNetCore
             var selector = new DefaultTargetSelector(new AspNetCoreTargetFactory(), extractor);
             foreach (var t in types)
                 selector.Register(extractor.GetTargetName(t), t);
-            return builder.UseCoreRpc(path, engine.CreateRequestHandler(selector, new CallInterceptor(cfg.Interceptors)));
+            return builder.UseCoreRpc(path, engine.CreateRequestHandler(selector,
+                new CallInterceptor(cfg.Interceptors), cfg.ErrorHandler));
         }
 
         class CallInterceptor : IMethodCallInterceptor
@@ -112,5 +113,6 @@ namespace CoreRPC.AspNetCore
         };
         public List<IMethodCallInterceptor> Interceptors { get; } = new List<IMethodCallInterceptor>();
         public Func<IEnumerable<Type>> RpcTypeResolver { get; set; }
+        public IRequestErrorHandler ErrorHandler { get; set; }
     }
 }

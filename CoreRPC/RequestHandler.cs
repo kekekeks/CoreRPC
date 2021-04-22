@@ -6,7 +6,6 @@ using CoreRPC.Routing;
 using CoreRPC.Serialization;
 using CoreRPC.Transferable;
 using CoreRPC.Transport;
-using System.Reflection;
 using CoreRPC.Utility;
 using Microsoft.IO;
 
@@ -18,14 +17,20 @@ namespace CoreRPC
         private readonly IMethodBinder _binder;
         private readonly IMethodCallSerializer _serializer;
         private readonly IMethodCallInterceptor _interceptor;
+        private readonly IRequestErrorHandler _errors;
 
-        public RequestHandler(ITargetSelector selector, IMethodBinder binder,
-            IMethodCallSerializer serializer, IMethodCallInterceptor interceptor)
+        public RequestHandler(
+            ITargetSelector selector,
+            IMethodBinder binder,
+            IMethodCallSerializer serializer,
+            IMethodCallInterceptor interceptor,
+            IRequestErrorHandler errors)
         {
             _selector = selector;
             _binder = binder;
             _serializer = serializer;
             _interceptor = interceptor;
+            _errors = errors;
         }
 
         static async Task<object> ConvertToTask(object ires)
@@ -115,21 +120,50 @@ namespace CoreRPC
 
             if (ex != null)
             {
-                response.Position = 0;
-                response.SetLength(0);
-                _serializer.SerializeException(response, ex.ToString());
-                response.Position = 0;
+                if (_errors != null)
+                {
+                    try
+                    {
+                        var handled = _errors.HandleError(ex);
+                        SerializeError(response, handled ?? "Internal Server Error");
+                    }
+                    catch
+                    {
+                        SerializeError(response, ex.ToString());
+                    }
+                }
+                else
+                {
+                    SerializeError(response, ex.ToString());
+                }
             }
 
             try
             {
                 await req.RespondAsync(response);
             }
-            catch
+            catch (Exception fatal)
             {
-                //TODO: redirect it somewhere?
+                if (_errors != null)
+                {
+                    try
+                    {
+                        _errors.HandleError(fatal);
+                    }
+                    catch
+                    {
+                        // We've tried.
+                    }
+                }
             }
         }
 
+        void SerializeError(RecyclableMemoryStream response, string error)
+        {
+            response.Position = 0;
+            response.SetLength(0);
+            _serializer.SerializeException(response, error);
+            response.Position = 0;
+        }
     }
 }

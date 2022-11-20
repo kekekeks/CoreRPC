@@ -52,16 +52,17 @@ namespace Tests
 
         public interface IFoo
         {
-            Task Test(int x, List<string> y);
+            Task Test(int x, List<string> y, string test);
         }
 
         private class Target : IFoo
         {
-            public Task Test(int x, List<string> y)
+            public Task Test(int x, List<string> y, string z)
             {
                 Assert.Equal(1, x);
                 Assert.Equal("2", y[0]);
                 Assert.Equal("3", y[1]);
+                Assert.Equal("2022-11-29T18:00:00.000Z", z);
                 return Task.CompletedTask;
             }
         }
@@ -99,7 +100,7 @@ namespace Tests
         {
             var proxy = new Proxy();
             var tproxy = ProxyGen.CreateInstance<IFoo>(proxy);
-            tproxy.Test(1, new List<string> { "2", "3" });
+            tproxy.Test(1, new List<string> { "2", "3" }, "2022-11-29T18:00:00.000Z");
             var ser = _serializer;
             var binder = new DefaultMethodBinder();
             var ms = new MemoryStream();

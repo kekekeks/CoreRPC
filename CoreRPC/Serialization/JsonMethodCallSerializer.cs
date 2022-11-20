@@ -35,7 +35,10 @@ namespace CoreRPC.Serialization
 
         JsonReader CreateReader(Stream stream) => _useBson
             ? (JsonReader) new BsonReader(stream)
-            : new JsonTextReader(new StreamReader(stream));
+            : new JsonTextReader(new StreamReader(stream))
+            {
+                DateParseHandling = DateParseHandling.None
+            };
 
         public void SerializeCall(Stream stream, IMethodBinder binder, string target, MethodCall call)
         {

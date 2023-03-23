@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>10</LangVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\CoreRPC.JsonLikeBinaryReaderWriter\CoreRPC.JsonLikeBinaryReaderWriter.csproj" />
+      <ProjectReference Include="..\..\CoreRPC\CoreRPC.csproj" />
+    </ItemGroup>
+
+</Project>

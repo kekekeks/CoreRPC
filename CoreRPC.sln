@@ -11,6 +11,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoreRPC.AspNetCore", "CoreR
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoreRPC.Testing", "CoreRPC.Testing\CoreRPC.Testing.csproj", "{AE2104C8-05E5-4D23-8711-21CFB7EDF9AD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoreRPC.JsonLikeBinarySerializer", "src\CoreRPC.JsonLikeBinarySerializer\CoreRPC.JsonLikeBinarySerializer.csproj", "{DE2F5A9C-192D-421C-AAF2-49334EFD2B90}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoreRPC.JsonLikeBinaryReaderWriter", "src\CoreRPC.JsonLikeBinaryReaderWriter\CoreRPC.JsonLikeBinaryReaderWriter.csproj", "{1F21E069-DDE1-4ADF-8247-D1104991D7DE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +37,14 @@ Global
 		{AE2104C8-05E5-4D23-8711-21CFB7EDF9AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AE2104C8-05E5-4D23-8711-21CFB7EDF9AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AE2104C8-05E5-4D23-8711-21CFB7EDF9AD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DE2F5A9C-192D-421C-AAF2-49334EFD2B90}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE2F5A9C-192D-421C-AAF2-49334EFD2B90}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE2F5A9C-192D-421C-AAF2-49334EFD2B90}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE2F5A9C-192D-421C-AAF2-49334EFD2B90}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F21E069-DDE1-4ADF-8247-D1104991D7DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F21E069-DDE1-4ADF-8247-D1104991D7DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F21E069-DDE1-4ADF-8247-D1104991D7DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F21E069-DDE1-4ADF-8247-D1104991D7DE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

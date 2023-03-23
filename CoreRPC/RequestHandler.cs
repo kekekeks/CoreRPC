@@ -71,13 +71,16 @@ namespace CoreRPC
                 object res = null;
                 try
                 {
-                    if (_interceptor != null)
+                    using (call)
                     {
-                        res = _interceptor.Intercept(call, req.Context,
-                            () => ConvertToTask(call.Method.Invoke(call.Target, call.Arguments)));
+                        if (_interceptor != null)
+                        {
+                            res = _interceptor.Intercept(call, req.Context,
+                                () => ConvertToTask(call.Method.Invoke(call.Target, call.Arguments)));
+                        }
+                        else
+                            res = call.Method.Invoke(call.Target, call.Arguments);
                     }
-                    else
-                        res = call.Method.Invoke(call.Target, call.Arguments);
                 }
                 catch (Exception e)
                 {

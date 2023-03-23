@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -14,31 +15,26 @@ namespace CoreRPC.Serialization
     public class JsonMethodCallSerializer : IMethodCallSerializer
     {
         private readonly JsonSerializer _serializer;
-        private readonly bool _useBson;
 
-        public JsonMethodCallSerializer(JsonSerializer serializer, bool useBson = false)
+        public JsonMethodCallSerializer(JsonSerializer serializer)
         {
             _serializer = serializer;
-            _useBson = useBson;
         }
 
-        public JsonMethodCallSerializer(bool useBson = false) : this(new JsonSerializer(), useBson)
+        public JsonMethodCallSerializer() : this(new JsonSerializer())
         {
 
         }
 
         private static readonly Encoding Utf8 = new UTF8Encoding(false);
 
-        JsonWriter CreateWriter(Stream stream) => _useBson
-            ? (JsonWriter) new BsonWriter(stream) {CloseOutput = false}
-            : new JsonTextWriter(new StreamWriter(stream, Utf8, 1024, true));
+        protected virtual JsonWriter CreateWriter(Stream stream) =>
+            new JsonTextWriter(new StreamWriter(stream, Utf8, 1024, true));
 
-        JsonReader CreateReader(Stream stream) => _useBson
-            ? (JsonReader) new BsonReader(stream)
-            : new JsonTextReader(new StreamReader(stream))
-            {
-                DateParseHandling = DateParseHandling.None
-            };
+        protected virtual JsonReader CreateReader(Stream stream) => new JsonTextReader(new StreamReader(stream))
+        {
+            DateParseHandling = DateParseHandling.None
+        };
 
         public void SerializeCall(Stream stream, IMethodBinder binder, string target, MethodCall call)
         {
@@ -49,7 +45,7 @@ namespace CoreRPC.Serialization
                 writer.WritePropertyName("Target");
                 writer.WriteValue(target);
                 writer.WritePropertyName("MethodSignature");
-                writer.WriteValue(_useBson ? (object) sig : Convert.ToBase64String(sig));
+                writer.WriteValue(sig);
                 writer.WritePropertyName("Arguments");
                 _serializer.Serialize(writer, call.Arguments);
                 writer.WriteEndObject();
@@ -58,18 +54,32 @@ namespace CoreRPC.Serialization
 
 
 
-        public MethodCall DeserializeCall(Stream stream, IMethodBinder binder,
+        public virtual MethodCall DeserializeCall(Stream stream, IMethodBinder binder,
             ITargetSelector selector, object callContext)
         {
-            var reader = CreateReader(stream).MoveToContent();
-            var rv = new MethodCall
-            {
-                Target = selector.GetTarget(reader.ReadProperty("Target").ToString(), callContext)
-            };
+            var call = new MethodCall();
+            DeserializeCallCore(call, CreateReader(stream), binder, selector, callContext);
+            return call;
+        }
+        
+        protected virtual void DeserializeCallCore(MethodCall rv, JsonReader reader, 
+            IMethodBinder binder, ITargetSelector selector, object callContext)
+        {
+            reader.MoveToContent();
 
-            var osig = reader.ReadProperty("MethodSignature");
-            var sig = osig as byte[] ?? Convert.FromBase64String((string) osig);
+            rv.Target = selector.GetTarget(reader.ReadProperty("Target").ToString(), callContext);
 
+            reader.ExpectProperty("MethodSignature");
+            var osig = reader.Value;
+            byte[] sig;
+            if (osig is byte[])
+                sig = (byte[])osig;
+            else if (osig is string)
+                sig = Convert.FromBase64String((string)osig);
+            else
+                sig = (byte[])TypeDescriptor.GetConverter(osig).ConvertTo(osig, typeof(byte[]));
+            reader.Next();
+            
             rv.Method = binder.GetInfoProviderFor(rv.Target).GetMethod(sig);
             reader.ExpectProperty("Arguments");
 
@@ -96,7 +106,6 @@ namespace CoreRPC.Serialization
                 reader.Next();
             }
             reader.MoveToEnd();
-            return rv;
         }
 
         public void SerializeResult(Stream stream, object result)
@@ -179,6 +188,25 @@ namespace CoreRPC.Serialization
             }
             reader.Read();
             return reader;
+        }
+    }
+    
+    public class BsonMethodCallSerializer : JsonMethodCallSerializer
+    {
+        protected override JsonWriter CreateWriter(Stream stream) =>
+            new BsonWriter(stream) { CloseOutput = false };
+
+        protected override JsonReader CreateReader(Stream stream) => new BsonReader(stream)
+            { DateParseHandling = DateParseHandling.None };
+
+        public BsonMethodCallSerializer()
+        {
+            
+        }
+
+        public BsonMethodCallSerializer(JsonSerializer serializer) : base(serializer)
+        {
+
         }
     }
 }

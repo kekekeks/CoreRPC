@@ -11,6 +11,7 @@ using CoreRPC;
 using CoreRPC.Binding;
 using CoreRPC.Binding.Default;
 using CoreRPC.CodeGen;
+using CoreRPC.JsonLikeBinarySerializer;
 using CoreRPC.Routing;
 using CoreRPC.Serialization;
 using CoreRPC.Transferable;
@@ -36,8 +37,16 @@ namespace Tests
 
     public class BsonMethodCallSerializerTests : MethodCallSerializerTests
     {
-        public BsonMethodCallSerializerTests() : base(new JsonMethodCallSerializer(true))
+        public BsonMethodCallSerializerTests() : base(new BsonMethodCallSerializer())
         {
+        }
+    }
+
+    public class BinaryMethodCallSerializerTests : MethodCallSerializerTests
+    {
+        public BinaryMethodCallSerializerTests():base(new BinaryJsonLikeMethodCallSerializer())
+        {
+            
         }
     }
 
@@ -53,6 +62,7 @@ namespace Tests
         public interface IFoo
         {
             Task Test(int x, List<string> y, string test);
+            Task<byte[]> Test(byte[] data);
         }
 
         private class Target : IFoo
@@ -64,6 +74,11 @@ namespace Tests
                 Assert.Equal("3", y[1]);
                 Assert.Equal("2022-11-29T18:00:00.000Z", z);
                 return Task.CompletedTask;
+            }
+
+            public async Task<byte[]> Test(byte[] data)
+            {
+                return data.Reverse().ToArray();
             }
         }
 
@@ -111,7 +126,7 @@ namespace Tests
             var call = ser.DeserializeCall(ms, binder, new TargetSelector(new Target()), "ctx");
             call.Method.Invoke(call.Target, call.Arguments);
         }
-
+        
         protected MethodCallResult Reserialize(object obj, Type expectedType)
         {
             var ser = _serializer;
@@ -144,13 +159,30 @@ namespace Tests
             var valueResult = Reserialize(new List<string> { "success" }, typeof(List<string>));
             Assert.Null(valueResult.Exception);
             Assert.Equal("success", ((List<string>)valueResult.Result)[0]);
+        }
+        
+        [Fact]
+        public void TestSerializeAndDeserializeBytes()
+        {
+            var proxy = new Proxy();
+            var tproxy = ProxyGen.CreateInstance<IFoo>(proxy);
+            tproxy.Test(new byte[] { 1, 2, 3 });
+            var ser = _serializer;
+            var binder = new DefaultMethodBinder();
+            var ms = new MemoryStream();
 
+            ser.SerializeCall(ms, binder, "Target", proxy.LastCall);
+            ms.Seek(0, SeekOrigin.Begin);
 
+            byte[] res;
+            using (var call = ser.DeserializeCall(ms, binder, new TargetSelector(new Target()), "ctx"))
+                res = ((Task<byte[]>)call.Method.Invoke(call.Target, call.Arguments)).Result;
 
-
-
+            var result = (byte[])Reserialize(res, typeof(byte[])).Result;
+            Assert.Equal(new byte[] { 3, 2, 1 }, result);
 
         }
+
     }
 
     public abstract class TypePreservingMethodCallSerializerTests : MethodCallSerializerTests
@@ -211,7 +243,15 @@ namespace Tests
     public class TypePreservingBsonMethodCallSerializerTests : TypePreservingMethodCallSerializerTests
     {
         public TypePreservingBsonMethodCallSerializerTests()
-            : base(new JsonMethodCallSerializer(new JsonSerializer() { TypeNameHandling = TypeNameHandling.All }, true))
+            : base(new BsonMethodCallSerializer(new JsonSerializer() { TypeNameHandling = TypeNameHandling.All }))
+        {
+        }
+    }
+    
+    public class TypePreservingBinaryMethodCallSerializerTests : TypePreservingMethodCallSerializerTests
+    {
+        public TypePreservingBinaryMethodCallSerializerTests()
+            : base(new BinaryJsonLikeMethodCallSerializer(new JsonSerializer() { TypeNameHandling = TypeNameHandling.All }, true))
         {
         }
     }

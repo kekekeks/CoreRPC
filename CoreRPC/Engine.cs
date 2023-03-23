@@ -19,7 +19,7 @@ namespace CoreRPC
         }
 
         public Engine()
-            : this(new JsonMethodCallSerializer(false), new DefaultMethodBinder())
+            : this(new JsonMethodCallSerializer(), new DefaultMethodBinder())
         {
 
         }

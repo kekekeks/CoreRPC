@@ -135,6 +135,7 @@ public class BinaryJsonLikeReader : JsonReader
 
                     _len -= read;
                 }
+                ArrayPool<byte>.Shared.Return(buf);
             }
         }
 

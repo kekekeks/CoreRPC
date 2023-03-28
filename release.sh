@@ -12,7 +12,7 @@ set -x
 dotnet msbuild /t:Restore /p:Version=$VERSION
 rm -rf build
 mkdir build
-for d in CoreRPC CoreRPC.AspNetCore
+for d in CoreRPC CoreRPC.AspNetCore src/CoreRPC.JsonLikeBinaryReaderWriter src/CoreRPC.JsonLikeBinarySerializer
 do
 	cd $DIR/$d
 	rm -rf bin/Release

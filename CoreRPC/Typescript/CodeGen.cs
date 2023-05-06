@@ -116,6 +116,8 @@ namespace CoreRPC.Typescript
             code.AppendLines(fields.ToArray());
             code.End();
 
+            foreach (var attg in opts.AdditionalTypes)
+                ctx.MapType(attg);
             return (ctx + "\n" + code).Replace("\r\n", "\n");
         }
 

@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using CoreRPC.Binding;
+using CoreRPC.Hooks;
 using CoreRPC.Routing;
 using CoreRPC.Serialization;
 using CoreRPC.Transferable;
@@ -106,7 +107,20 @@ namespace CoreRPC
                     }
                 }
             }
-
+            
+            try
+            {
+                await this.SendResponse(req, result, ex);
+            }
+            finally
+            {
+                if (call?.Target is IMethodCallFinishedTargetHook target)
+                    target.OnMethodCallFinished();
+            }
+        }
+        
+        async Task SendResponse(IRequest req, object result, Exception ex)
+        {            
             using var response = new RecyclableMemoryStream(StreamPool.Shared);
             if (ex == null)
             {

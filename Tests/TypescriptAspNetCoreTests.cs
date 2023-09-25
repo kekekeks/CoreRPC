@@ -92,6 +92,11 @@ namespace Tests
         public static string StaticPropertyThisTextShouldNotExistInGeneratedFile { get; set; } = "I'm a static.";
     }
 
+    public class MyImplicitDto
+    {
+        public string MyImplicitDtoProperty { get; set; }
+    }
+
     [RegisterRpc]
     public class StaticFields
     {
@@ -122,7 +127,7 @@ namespace Tests
         {
             var code =
                 "import {default as fetch, RequestInit, Response} from \"node-fetch\";\n" +
-                AspNetCoreRpcTypescriptGenerator.GenerateCode(env);
+                AspNetCoreRpcTypescriptGenerator.GenerateCode(env, o => o.AdditionalTypes.Add(typeof(MyImplicitDto)));
             File.WriteAllText(Path.Combine(JsDir, "api.ts"), code);
         }
 
@@ -192,6 +197,8 @@ namespace Tests
             var generatedStuff = File.ReadAllText(apiTs);
             Assert.Contains(nameof(MyStaticFieldsDto.MyStaticFieldsDtoRegularProperty), generatedStuff);
             Assert.Contains(nameof(MyTsIgnoreDto.MyTsIgnoreDtoRegularProperty), generatedStuff);
+            Assert.Contains(nameof(MyImplicitDto), generatedStuff);
+            Assert.Contains(nameof(MyImplicitDto.MyImplicitDtoProperty), generatedStuff);
             Assert.DoesNotContain("ThisTextShouldNotExistInGeneratedFile", generatedStuff);
         }
     }

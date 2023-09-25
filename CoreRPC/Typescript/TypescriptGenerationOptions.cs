@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using CoreRPC.Binding;
 using CoreRPC.Binding.Default;
@@ -18,6 +19,7 @@ namespace CoreRPC.Typescript
         public string ClassName { get; set; } = "CoreApi";
         public Func<Type, Type> CustomTypeMapping { get; set; } = null;
         public CustomTsTypeMapping CustomTsTypeMapping { get; set; } = null;
+        public List<Type> AdditionalTypes { get; set; } = new();
     }
 
     public delegate string CustomTsTypeMapping(Type type, Func<Type, string> subTypeMapper);

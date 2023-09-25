@@ -229,14 +229,26 @@ public class BinaryJsonLikeReader : JsonReader
 
             var buffer = ArrayPool<byte>.Shared.Rent(1024);
             var ms = _pool.RentStream(_len);
-            var len = _len;
-            while (len > 0)
+            try
             {
-                var read = _s.Read(buffer, 0, Math.Min(buffer.Length, _len));
-                if (read == 0)
-                    throw new EndOfStreamException();
-                ms.Write(buffer,0, read);
-                len -= read;
+                var len = _len;
+                while (len > 0)
+                {
+                    var read = _s.Read(buffer, 0, Math.Min(buffer.Length, len));
+                    if (read == 0)
+                        throw new EndOfStreamException();
+                    ms.Write(buffer, 0, read);
+                    len -= read;
+                }
+            }
+            catch
+            {
+                ms.Dispose();
+                throw;
+            }
+            finally
+            {
+                ArrayPool<byte>.Shared.Return(buffer);
             }
 
             ms.Position = 0;

@@ -49,39 +49,38 @@ namespace CoreRPC
         {
             Exception ex = null;
             object result = null;
-            MethodCall call = null;
+            MethodCall deserializedCall = null;
             try
             {
                 if (req.Data is RecyclableMemoryStream || req.Data is MemoryStream)
-                    call = _serializer.DeserializeCall(req.Data, _binder, _selector, req.Context);
+                    deserializedCall = _serializer.DeserializeCall(req.Data, _binder, _selector, req.Context);
                 else
                 {
                     using var copy = new RecyclableMemoryStream(StreamPool.Shared);
                     await req.Data.CopyToAsync(copy);
                     req.Data.Dispose();
                     copy.Position = 0;
-                    call = _serializer.DeserializeCall(copy, _binder, _selector, req.Context);
+                    deserializedCall = _serializer.DeserializeCall(copy, _binder, _selector, req.Context);
                 }
             }
             catch (Exception e)
             {
                 ex = e;
             }
+
+            using var call = deserializedCall;
             if (call != null)
             {
                 object res = null;
                 try
                 {
-                    using (call)
+                    if (_interceptor != null)
                     {
-                        if (_interceptor != null)
-                        {
-                            res = _interceptor.Intercept(call, req.Context,
-                                () => ConvertToTask(call.Method.Invoke(call.Target, call.Arguments)));
-                        }
-                        else
-                            res = call.Method.Invoke(call.Target, call.Arguments);
+                        res = _interceptor.Intercept(call, req.Context,
+                            () => ConvertToTask(call.Method.Invoke(call.Target, call.Arguments)));
                     }
+                    else
+                        res = call.Method.Invoke(call.Target, call.Arguments);
                 }
                 catch (Exception e)
                 {

@@ -55,19 +55,24 @@ namespace CoreRPC.Serialization
 
 
         public virtual MethodCall DeserializeCall(Stream stream, IMethodBinder binder,
-            ITargetSelector selector, object callContext)
+            ITargetSelector selector, object? callContext)
         {
-            var call = new MethodCall();
+            // DeserializeCallCore will set Method property, suppress warning here.
+            var call = new MethodCall() { Method = null! };
             DeserializeCallCore(call, CreateReader(stream), binder, selector, callContext);
             return call;
         }
         
         protected virtual void DeserializeCallCore(MethodCall rv, JsonReader reader, 
-            IMethodBinder binder, ITargetSelector selector, object callContext)
+            IMethodBinder binder, ITargetSelector selector, object? callContext)
         {
             reader.MoveToContent();
 
-            rv.Target = selector.GetTarget(reader.ReadProperty("Target").ToString(), callContext);
+            var targetName = reader.ReadProperty("Target").ToString();
+            if (targetName is null)
+                throw new ArgumentException("Expected Target");
+            
+            rv.Target = selector.GetTarget(targetName, callContext);
 
             reader.ExpectProperty("MethodSignature");
             var osig = reader.Value;
@@ -77,7 +82,7 @@ namespace CoreRPC.Serialization
             else if (osig is string)
                 sig = Convert.FromBase64String((string)osig);
             else
-                sig = (byte[])TypeDescriptor.GetConverter(osig).ConvertTo(osig, typeof(byte[]));
+                sig = (byte[])TypeDescriptor.GetConverter(osig).ConvertTo(osig, typeof(byte[]))!;
             reader.Next();
             
             rv.Method = binder.GetInfoProviderFor(rv.Target).GetMethod(sig);
@@ -108,7 +113,7 @@ namespace CoreRPC.Serialization
             reader.MoveToEnd();
         }
 
-        public void SerializeResult(Stream stream, object result)
+        public void SerializeResult(Stream stream, object? result)
         {
             using (var w = CreateWriter(stream))
             {

@@ -25,7 +25,7 @@ namespace CoreRPC
         }
 
 
-        public IRequestHandler CreateRequestHandler(ITargetSelector selector, IRequestErrorHandler errors = null)
+        public IRequestHandler CreateRequestHandler(ITargetSelector selector, IRequestErrorHandler? errors = null)
         {
             return new RequestHandler(selector, _binder, _serializer, null, errors);
         }
@@ -33,12 +33,12 @@ namespace CoreRPC
         public IRequestHandler CreateRequestHandler(
             ITargetSelector selector,
             IMethodCallInterceptor interceptor,
-            IRequestErrorHandler errors = null)
+            IRequestErrorHandler? errors = null)
         {
             return new RequestHandler(selector, _binder, _serializer, interceptor, errors);
         }
 
-        public TInterface CreateProxy<TInterface>(IClientTransport transport, ITargetNameExtractor nameExtractor = null)
+        public TInterface CreateProxy<TInterface>(IClientTransport transport, ITargetNameExtractor? nameExtractor = null)
         {
             if (nameExtractor == null)
                 nameExtractor = new DefaultTargetNameExtractor();

@@ -15,8 +15,8 @@ namespace CoreRPC.Serialization
     {
         void SerializeCall(Stream stream, IMethodBinder binder, string target, MethodCall call);
         MethodCall DeserializeCall(Stream stream, IMethodBinder binder,
-            ITargetSelector selector, object callContext);
-        void SerializeResult(Stream stream, object result);
+            ITargetSelector selector, object? callContext);
+        void SerializeResult(Stream stream, object? result);
         void SerializeException(Stream stream, string exception);
         
         MethodCallResult DeserializeResult(Stream stream, Type expectedType);

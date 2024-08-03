@@ -17,15 +17,15 @@ namespace CoreRPC
         private readonly ITargetSelector _selector;
         private readonly IMethodBinder _binder;
         private readonly IMethodCallSerializer _serializer;
-        private readonly IMethodCallInterceptor _interceptor;
-        private readonly IRequestErrorHandler _errors;
+        private readonly IMethodCallInterceptor? _interceptor;
+        private readonly IRequestErrorHandler? _errors;
 
         public RequestHandler(
             ITargetSelector selector,
             IMethodBinder binder,
             IMethodCallSerializer serializer,
-            IMethodCallInterceptor interceptor,
-            IRequestErrorHandler errors)
+            IMethodCallInterceptor? interceptor,
+            IRequestErrorHandler? errors)
         {
             _selector = selector;
             _binder = binder;
@@ -34,7 +34,7 @@ namespace CoreRPC
             _errors = errors;
         }
 
-        static async Task<object> ConvertToTask(object ires)
+        static async Task<object?> ConvertToTask(object? ires)
         {
             if (ires is Task task)
             {
@@ -47,9 +47,9 @@ namespace CoreRPC
 
         async Task IRequestHandler.HandleRequest (IRequest req)
         {
-            Exception ex = null;
-            object result = null;
-            MethodCall deserializedCall = null;
+            Exception? ex = null;
+            object? result = null;
+            MethodCall? deserializedCall = null;
             try
             {
                 if (req.Data is RecyclableMemoryStream || req.Data is MemoryStream)
@@ -71,7 +71,7 @@ namespace CoreRPC
             using var call = deserializedCall;
             if (call != null)
             {
-                object res = null;
+                object? res = null;
                 try
                 {
                     if (_interceptor != null)
@@ -118,7 +118,7 @@ namespace CoreRPC
             }
         }
         
-        async Task SendResponse(IRequest req, object result, Exception ex)
+        async Task SendResponse(IRequest req, object? result, Exception? ex)
         {            
             using var response = new RecyclableMemoryStream(StreamPool.Shared);
             if (ex == null)

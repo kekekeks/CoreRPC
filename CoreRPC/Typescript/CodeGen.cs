@@ -46,8 +46,8 @@ namespace CoreRPC.Typescript
                         var names = new List<string>();
                         foreach (var p in m.GetParameters())
                         {
-                            code.AppendMethodParameter(p.Name, ctx.MapType(p.ParameterType));
-                            names.Add(p.Name);
+                            code.AppendMethodParameter(p.Name!, ctx.MapType(p.ParameterType));
+                            names.Add(p.Name!);
                         }
 
                         var returnType = m.ReturnType;

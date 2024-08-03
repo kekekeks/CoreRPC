@@ -6,6 +6,6 @@ namespace CoreRPC
 {
     public interface IMethodCallInterceptor
     {
-        Task<object> Intercept(MethodCall call, object context,  Func<Task<object>> invoke);
+        Task<object> Intercept(MethodCall call, object? context, Func<Task<object?>> invoke);
     }
 }

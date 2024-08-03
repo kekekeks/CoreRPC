@@ -2,7 +2,7 @@
 {
     public class MethodCallResult
     {
-        public string Exception { get; set; }
-        public object Result { get; set; }
+        public string? Exception { get; set; }
+        public object? Result { get; set; }
     }
 }

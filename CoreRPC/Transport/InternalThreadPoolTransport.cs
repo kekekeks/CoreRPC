@@ -26,7 +26,7 @@ namespace CoreRPC.Transport
             }
 
             public Stream Data { get; private set; }
-            public object Context { get; } = null;
+            public object? Context { get; } = null;
             public async Task RespondAsync(Stream data)
             {
                 var ms = new RecyclableMemoryStream(StreamPool.Shared);

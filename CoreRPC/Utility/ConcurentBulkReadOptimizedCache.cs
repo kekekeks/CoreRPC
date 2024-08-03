@@ -4,6 +4,7 @@ using System.Collections.Generic;
 namespace CoreRPC.Utility
 {
     public class ConcurentBulkReadOptimizedCache<TKey, TValue>
+        where TKey : notnull 
     {
         readonly Dictionary<TKey, TValue> _dictionary = new Dictionary<TKey, TValue> ();
         readonly Func<TKey, TValue> _getter;
@@ -43,8 +44,7 @@ namespace CoreRPC.Utility
             {
                 get
                 {
-                    TValue rv;
-                    if (_snapshot.TryGetValue (key, out rv))
+                    if (_snapshot.TryGetValue (key, out var rv))
                         return rv;
                     _snapshot = _parent.GetUpdatedSnapshot (key);
                     return _snapshot[key];

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -12,6 +13,7 @@ using Newtonsoft.Json.Bson;
 
 namespace CoreRPC.Serialization
 {
+    [RequiresUnreferencedCode("Newtonsoft.Json uses reflection.")]
     public class JsonMethodCallSerializer : IMethodCallSerializer
     {
         private readonly JsonSerializer _serializer;
@@ -190,7 +192,8 @@ namespace CoreRPC.Serialization
             return reader;
         }
     }
-    
+
+    [RequiresUnreferencedCode("Newtonsoft uses reflection.")]
     public class BsonMethodCallSerializer : JsonMethodCallSerializer
     {
         protected override JsonWriter CreateWriter(Stream stream) =>

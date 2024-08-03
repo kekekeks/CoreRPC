@@ -1,4 +1,5 @@
-﻿using CoreRPC.Binding;
+﻿using System.Diagnostics.CodeAnalysis;
+using CoreRPC.Binding;
 using CoreRPC.Binding.Default;
 using CoreRPC.CodeGen;
 using CoreRPC.Routing;
@@ -18,6 +19,7 @@ namespace CoreRPC
             _serializer = serializer;
         }
 
+        [RequiresUnreferencedCode("JsonMethodCallSerializer uses reflection.")]
         public Engine()
             : this(new JsonMethodCallSerializer(), new DefaultMethodBinder())
         {
@@ -38,6 +40,8 @@ namespace CoreRPC
             return new RequestHandler(selector, _binder, _serializer, interceptor, errors);
         }
 
+        [RequiresUnreferencedCode("CreateProxy generates dynamic proxy in runtime.")]
+        [RequiresDynamicCode("CreateProxy requires dynamic code.")]
         public TInterface CreateProxy<TInterface>(IClientTransport transport, ITargetNameExtractor nameExtractor = null)
         {
             if (nameExtractor == null)

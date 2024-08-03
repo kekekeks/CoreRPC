@@ -1,4 +1,6 @@
-﻿using CoreRPC.Binding;
+﻿using System;
+using System.Reflection;
+using CoreRPC.Binding;
 using CoreRPC.Binding.Default;
 using CoreRPC.CodeGen;
 using CoreRPC.Routing;
@@ -39,11 +41,23 @@ namespace CoreRPC
         }
 
         public TInterface CreateProxy<TInterface>(IClientTransport transport, ITargetNameExtractor nameExtractor = null)
+            where TInterface : class
         {
             if (nameExtractor == null)
                 nameExtractor = new DefaultTargetNameExtractor();
-            return ProxyGen.CreateInstance<TInterface>(new CallProxy(transport, _serializer,
-                                                                     _binder, nameExtractor.GetTargetName(typeof (TInterface))));
+
+            var realProxy = new CallProxy(transport, _serializer,
+                _binder, nameExtractor.GetTargetName(typeof(TInterface)));
+
+            var proxy = typeof(TInterface).Assembly
+                .GetCustomAttribute<RpcServiceProxyAttribute<TInterface>>()?
+                .CreateProxy(realProxy);
+
+#if DISABLE_PROXY_GEN
+            return proxy ?? throw new InvalidOperationException($"{typeof(TInterface).FullName} proxy wasn't generated.");
+#else
+            return proxy ?? ProxyGen.CreateInstance<TInterface>(realProxy);
+#endif
         }
     }
 }

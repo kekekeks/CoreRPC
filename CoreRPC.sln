@@ -1,19 +1,23 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26510.0
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35017.193
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoreRPC", "CoreRPC\CoreRPC.csproj", "{6EDF84FF-70A0-454D-A946-65481405D05B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{9FC60936-8467-4119-8471-1E934557856B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests", "Tests\Tests.csproj", "{9FC60936-8467-4119-8471-1E934557856B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoreRPC.AspNetCore", "CoreRPC.AspNetCore\CoreRPC.AspNetCore.csproj", "{20E4095E-D61A-46D3-8BDE-FD7E786D36F4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoreRPC.Testing", "CoreRPC.Testing\CoreRPC.Testing.csproj", "{AE2104C8-05E5-4D23-8711-21CFB7EDF9AD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoreRPC.Testing", "CoreRPC.Testing\CoreRPC.Testing.csproj", "{AE2104C8-05E5-4D23-8711-21CFB7EDF9AD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoreRPC.JsonLikeBinarySerializer", "src\CoreRPC.JsonLikeBinarySerializer\CoreRPC.JsonLikeBinarySerializer.csproj", "{DE2F5A9C-192D-421C-AAF2-49334EFD2B90}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoreRPC.JsonLikeBinarySerializer", "src\CoreRPC.JsonLikeBinarySerializer\CoreRPC.JsonLikeBinarySerializer.csproj", "{DE2F5A9C-192D-421C-AAF2-49334EFD2B90}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoreRPC.JsonLikeBinaryReaderWriter", "src\CoreRPC.JsonLikeBinaryReaderWriter\CoreRPC.JsonLikeBinaryReaderWriter.csproj", "{1F21E069-DDE1-4ADF-8247-D1104991D7DE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoreRPC.JsonLikeBinaryReaderWriter", "src\CoreRPC.JsonLikeBinaryReaderWriter\CoreRPC.JsonLikeBinaryReaderWriter.csproj", "{1F21E069-DDE1-4ADF-8247-D1104991D7DE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoreRPC.SourceGenerator", "CoreRPC.SourceGenerator\CoreRPC.SourceGenerator.csproj", "{F82A7590-8E40-4A91-847D-7069157569D7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleSandbox", "ConsoleSandbox\ConsoleSandbox.csproj", "{C9274421-D4E1-4E6B-8567-8BC6A0D16526}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,8 +49,19 @@ Global
 		{1F21E069-DDE1-4ADF-8247-D1104991D7DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1F21E069-DDE1-4ADF-8247-D1104991D7DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1F21E069-DDE1-4ADF-8247-D1104991D7DE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F82A7590-8E40-4A91-847D-7069157569D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F82A7590-8E40-4A91-847D-7069157569D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F82A7590-8E40-4A91-847D-7069157569D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F82A7590-8E40-4A91-847D-7069157569D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C9274421-D4E1-4E6B-8567-8BC6A0D16526}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C9274421-D4E1-4E6B-8567-8BC6A0D16526}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C9274421-D4E1-4E6B-8567-8BC6A0D16526}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C9274421-D4E1-4E6B-8567-8BC6A0D16526}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5B715C25-A898-47FD-87E6-67CE271C457F}
 	EndGlobalSection
 EndGlobal

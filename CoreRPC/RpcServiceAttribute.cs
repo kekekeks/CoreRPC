@@ -17,6 +17,7 @@ public sealed class RpcServiceProxyAttribute<TInterface>(
 #endif
     Type proxyType) : Attribute
 {
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
     public Type ProxyProxyType { get; } = proxyType;
 
     public TInterface CreateProxy(IRealProxy realProxy)

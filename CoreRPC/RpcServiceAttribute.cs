@@ -10,7 +10,7 @@ public sealed class RpcServiceAttribute : Attribute
 
 }
 
-[AttributeUsage(AttributeTargets.Assembly)]
+[AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
 public sealed class RpcServiceProxyAttribute<TInterface>(
 #if NET6_0_OR_GREATER
     [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]

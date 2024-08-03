@@ -53,11 +53,7 @@ namespace CoreRPC
                 .GetCustomAttribute<RpcServiceProxyAttribute<TInterface>>()?
                 .CreateProxy(realProxy);
 
-#if DISABLE_PROXY_GEN
-            return proxy ?? throw new InvalidOperationException($"{typeof(TInterface).FullName} proxy wasn't generated.");
-#else
             return proxy ?? ProxyGen.CreateInstance<TInterface>(realProxy);
-#endif
         }
     }
 }

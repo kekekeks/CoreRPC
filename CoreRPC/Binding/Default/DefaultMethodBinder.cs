@@ -16,8 +16,7 @@ namespace CoreRPC.Binding.Default
             lock (_cache)
             {
                 var type = obj.GetType();
-                Implementation rv;
-                if (!_cache.TryGetValue(type, out rv))
+                if (!_cache.TryGetValue(type, out var rv))
                     _cache[type] = rv = new Implementation(type);
                 return rv;
             }
@@ -40,7 +39,7 @@ namespace CoreRPC.Binding.Default
             {
                 bw.Write(nfo.Name);
                 foreach (var arg in nfo.GetParameters())
-                    bw.Write(arg.ParameterType.FullName);
+                    bw.Write(arg.ParameterType.FullName!);
             }
             return ms.ToArray();
         }

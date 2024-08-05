@@ -91,7 +91,7 @@ namespace CoreRPC.Typescript
             
             var info = t.GetTypeInfo();
             if (info.IsGenericType && info.GetGenericTypeDefinition() == typeof(Nullable<>))
-                return MapType(Nullable.GetUnderlyingType(t)) + " | null";
+                return MapType(Nullable.GetUnderlyingType(t)!) + " | null";
             if (typeof(JToken).IsAssignableFrom(t))
                 return "any";
             if (t == typeof(object))

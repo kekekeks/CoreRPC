@@ -15,15 +15,15 @@ namespace CoreRPC.Serialization
     /// </summary>
     public class XmlMethodCallSerializer : IMethodCallSerializer
     {
-        private static readonly XmlAttributeOverrides Attributes;
+        private static readonly XmlAttributeOverrides? Attributes;
 
         private static readonly ConcurentBulkReadOptimizedCache<Type, ISerializableFactory> Cache =
-            new ConcurentBulkReadOptimizedCache<Type, ISerializableFactory> (t => (ISerializableFactory)Activator.CreateInstance (typeof (ArgumentContainer<>).MakeGenericType (t)));
+            new ConcurentBulkReadOptimizedCache<Type, ISerializableFactory> (t => (ISerializableFactory)Activator.CreateInstance (typeof (ArgumentContainer<>).MakeGenericType (t))!);
 
         public interface ISerializable
         {
             [XmlIgnore]
-            object Value { get; set; }
+            object? Value { get; set; }
         }
 
         public interface ISerializableFactory
@@ -49,13 +49,13 @@ namespace CoreRPC.Serialization
             }
 
             [XmlIgnore]
-            object ISerializable.Value
+            object? ISerializable.Value
             {
                 get { return Value; }
-                set { Value = (T) value; }
+                set { Value = (T?) value; }
             }
 
-            public T Value { get; set; }
+            public T? Value { get; set; }
         }
 
 
@@ -77,7 +77,7 @@ namespace CoreRPC.Serialization
                 var parameter = parameters[i];
                 var serializer = ctx[parameter.ParameterType];
                 var container = serializer.Create();
-                container.Value = call.Arguments[i];
+                container.Value = call.Arguments?[i];
                 serializer.Serializer.Serialize(writer, container);
             }
             writer.WriteEndElement();
@@ -87,28 +87,31 @@ namespace CoreRPC.Serialization
         }
 
         public MethodCall DeserializeCall(Stream stream, IMethodBinder info,
-            ITargetSelector selector, object callContext)
+            ITargetSelector selector, object? callContext)
         {
             var reader = XmlReader.Create(stream);
 
             while (reader.NodeType != XmlNodeType.Element)
                 reader.Read();
 
-            var rv = new MethodCall();
-
             reader.ReadStartElement("MethodCall"); //Skip root node
 
-            rv.Target = selector.GetTarget(reader.ReadElementContentAsString(), callContext);
-            rv.Method = info.GetInfoProviderFor(rv.Target).GetMethod(Convert.FromBase64String(reader.ReadElementContentAsString()));
+            var target = selector.GetTarget(reader.ReadElementContentAsString(), callContext);
+            var method = info.GetInfoProviderFor(target).GetMethod(Convert.FromBase64String(reader.ReadElementContentAsString()));
+            var rv = new MethodCall
+            {
+                Target = target,
+                Method = method
+            };
 
             reader.ReadStartElement("Arguments");
 
             var ctx = Cache.GetContext();
-            rv.Arguments = rv.Method.GetParameters().Select(parameter => ((ISerializable) ctx[parameter.ParameterType].Serializer.Deserialize(reader)).Value).ToArray();
+            rv.Arguments = rv.Method.GetParameters().Select(parameter => ((ISerializable?) ctx[parameter.ParameterType].Serializer.Deserialize(reader))?.Value).ToArray();
             return rv;
         }
 
-        public void SerializeResult(Stream stream, object result)
+        public void SerializeResult(Stream stream, object? result)
         {
             var writer = XmlWriter.Create(stream);
             writer.WriteStartElement("MethodCallResult");
@@ -149,7 +152,7 @@ namespace CoreRPC.Serialization
             else if (reader.Name == "Object")
             {
                 var ser = Cache.GetContext()[expectedType];
-                rv.Result = ((ISerializable) ser.Serializer.Deserialize(reader)).Value;
+                rv.Result = ((ISerializable?) ser.Serializer.Deserialize(reader))?.Value;
             }
             return rv;
         }

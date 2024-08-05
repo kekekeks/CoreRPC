@@ -33,6 +33,7 @@ namespace CoreRPC.Routing
         }
 
         public void Register<TInterface, THandler>(THandler instance)
+            where THandler : notnull
         {
             _instanceHandlers.Add(_extractor.GetTargetName(typeof(TInterface)), instance);
         }
@@ -52,7 +53,7 @@ namespace CoreRPC.Routing
         }
 
 
-        object ITargetSelector.GetTarget (string target, object callContext)
+        object ITargetSelector.GetTarget (string target, object? callContext)
         {
             if (_instanceHandlers.TryGetValue(target, out var instance))
                 return instance;

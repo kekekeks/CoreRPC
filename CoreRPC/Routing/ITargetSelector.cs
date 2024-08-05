@@ -2,6 +2,6 @@
 {
     public interface ITargetSelector
     {
-        object GetTarget(string target, object callContext);
+        object GetTarget(string target, object? callContext);
     }
 }

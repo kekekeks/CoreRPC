@@ -19,7 +19,7 @@ namespace CoreRPC.CodeGen
         {
 // ReSharper disable StaticFieldInGenericType
             public static readonly object SyncRoot = new object();
-            public static Func<IRealProxy, TInterface> Constructor;
+            public static Func<IRealProxy, TInterface>? Constructor;
 // ReSharper restore StaticFieldInGenericType
         }
 
@@ -37,9 +37,9 @@ namespace CoreRPC.CodeGen
             }
         }
 
-        private static readonly MethodInfo ListAddMethod = typeof (List<object>).GetMethod("Add", new[] {typeof (object)});
-        private static readonly ConstructorInfo ListConstructor = typeof (List<object>).GetConstructor(Type.EmptyTypes);
-        private static readonly MethodInfo ProxyInvoke = typeof (IRealProxy).GetMethod("Invoke");
+        private static readonly MethodInfo ListAddMethod = typeof (List<object>).GetMethod("Add", new[] {typeof (object)})!;
+        private static readonly ConstructorInfo ListConstructor = typeof (List<object>).GetConstructor(Type.EmptyTypes)!;
+        private static readonly MethodInfo ProxyInvoke = typeof (IRealProxy).GetMethod("Invoke")!;
 
         private static Func<IRealProxy, TInterface> Generate<TInterface>()
         {
@@ -111,7 +111,7 @@ namespace CoreRPC.CodeGen
                 });
 
             foreach (var storedMethod in storedMethods)
-                type.GetField(storedMethod.Key, BindingFlags.Static | BindingFlags.NonPublic).SetValue(null, storedMethod.Value);
+                type.GetField(storedMethod.Key, BindingFlags.Static | BindingFlags.NonPublic)!.SetValue(null, storedMethod.Value);
 
             var ctor = type.GetConstructors()[0];
             var arg = Expression.Parameter(typeof (IRealProxy), "proxy");

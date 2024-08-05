@@ -41,7 +41,7 @@ namespace CoreRPC.Transport.NamedPipe
             {
                 var requestLengthBytes = await pipe.ReadExactlyAsync(4);
                 var requestLength = BitConverter.ToInt32(requestLengthBytes, 0);
-                Stream response = null;
+                Stream? response = null;
                 using (var request = new RecyclableMemoryStream(StreamPool.Shared))
                 {
                     await pipe.ReadExactlyAsync(request, requestLength);
@@ -73,7 +73,7 @@ namespace CoreRPC.Transport.NamedPipe
 
             public Stream Data { get; }
 
-            public object Context { get; } = null;
+            public object? Context { get; } = null;
 
             public Task RespondAsync(Stream data) => _respond(data);
         }

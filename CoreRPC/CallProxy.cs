@@ -44,7 +44,7 @@ namespace CoreRPC
             var res = await SendAndParseResponse(ms, typeof(T));
             if(res.Exception != null)
                 throw new Exception(res.Exception);
-            return (T) res.Result;
+            return (T) res.Result!;
         }
 
         async Task<MethodCallResult> SendAndParseResponse(Stream data, Type expectedType)

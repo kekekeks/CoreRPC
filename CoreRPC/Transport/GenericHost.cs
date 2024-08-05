@@ -15,14 +15,14 @@ namespace CoreRPC.Transport
         {
             private readonly TaskCompletionSource<Stream> _tcs;
 
-            public Request(Stream data, TaskCompletionSource<Stream> tcs, object context = null)
+            public Request(Stream data, TaskCompletionSource<Stream> tcs, object? context = null)
             {
                 Data = data;
                 Context = context;
                 _tcs = tcs;
             }
 
-            public object Context { get; }
+            public object? Context { get; }
 
             public Task RespondAsync(Stream data)
             {

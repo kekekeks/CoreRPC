@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Xml;
@@ -13,6 +14,8 @@ namespace CoreRPC.Serialization
     /// <summary>
     /// Implementation limitations: root element children MUST be in exactly same order that is used by serializer
     /// </summary>
+    [RequiresUnreferencedCode("XmlSerializer uses reflection.")]
+    [RequiresDynamicCode("ProxyGen requires dynamic code.")]
     public class XmlMethodCallSerializer : IMethodCallSerializer
     {
         private static readonly XmlAttributeOverrides Attributes;
@@ -35,6 +38,7 @@ namespace CoreRPC.Serialization
         }
 
         [XmlRoot("Object")]
+        [RequiresUnreferencedCode("XmlSerializer uses reflection.")]
         public class ArgumentContainer<T> : ISerializable, ISerializableFactory
         {
 // ReSharper disable StaticFieldInGenericType

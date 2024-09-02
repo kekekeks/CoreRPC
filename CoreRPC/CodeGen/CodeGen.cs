@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Reflection.Emit;
 
 namespace CoreRPC.CodeGen
 {
+    [RequiresUnreferencedCode("Generator uses reflection.")]
+    [RequiresDynamicCode("ProxyGen requires dynamic code.")]
     internal static class Generator
     {
         private static readonly AssemblyBuilder Asm = AssemblyBuilder.DefineDynamicAssembly(

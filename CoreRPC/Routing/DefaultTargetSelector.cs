@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace CoreRPC.Routing
@@ -22,12 +23,12 @@ namespace CoreRPC.Routing
             _extractor = extractor;
         }
 
-        public void Register(string name, Type handler)
+        public void Register(string name, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] Type handler)
         {
             _handlers.Add(name, handler);
         }
 
-        public void Register<THandler>(string name)
+        public void Register<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] THandler>(string name)
         {
             Register(name, typeof (THandler));
         }
@@ -37,7 +38,7 @@ namespace CoreRPC.Routing
             _instanceHandlers.Add(_extractor.GetTargetName(typeof(TInterface)), instance);
         }
 
-        public void Register(Type iface, Type handler)
+        public void Register(Type iface, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] Type handler)
         {
             if (!iface.GetTypeInfo().IsInterface)
                 throw new ArgumentException("iface should be interface");
@@ -46,7 +47,7 @@ namespace CoreRPC.Routing
             Register(_extractor.GetTargetName(iface), handler);
         }
 
-        public void Register<TInterface, THandler>() where THandler : TInterface
+        public void Register<TInterface, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] THandler>() where THandler : TInterface
         {
             Register(typeof (TInterface), typeof (THandler));
         }

@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Threading.Tasks;
 
 namespace CoreRPC.Typescript
 {
+    [RequiresUnreferencedCode("TypescriptClientGenerator uses reflection.")]
     public static class TypescriptClientGenerator
     {       
         public static string GenerateGlueCode(TypescriptGenerationOptions opts, IEnumerable<Type> types)

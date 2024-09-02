@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -49,7 +50,7 @@ namespace CoreRPC.Binding.Default
         {
             private readonly List<KeyValuePair<byte[], MethodInfo>> _signatures = new List<KeyValuePair<byte[], MethodInfo>>();
 
-            public Implementation(Type type)
+            public Implementation([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] Type type)
             {
                 _signatures = type.GetMethods().Select(m => new KeyValuePair<byte[], MethodInfo>(GetMethodSignature(m), m)).ToList();
             }

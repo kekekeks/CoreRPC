@@ -11,11 +11,13 @@ namespace CoreRPC.Transport.NamedPipe
     {
         private readonly string _serverName;
         private readonly string _pipeName;
+        private readonly int? _timeout;
 
-        public NamedPipeClientTransport(string pipeName, string serverName = ".")
+        public NamedPipeClientTransport(string pipeName, string serverName = ".", int? timeout = null)
         {
             _serverName = serverName;
             _pipeName = pipeName;
+            _timeout = timeout;
         }
 
         
@@ -23,7 +25,14 @@ namespace CoreRPC.Transport.NamedPipe
         {
             using (var pipe = new NamedPipeClientStream(_serverName, _pipeName, PipeDirection.InOut, PipeOptions.Asynchronous))
             {
-                await pipe.ConnectAsync();
+                if (_timeout.HasValue)
+                {
+                    await pipe.ConnectAsync(_timeout.Value);
+                }
+                else
+                {
+                    await pipe.ConnectAsync();
+                }
 
                 var requestLengthBytes = BitConverter.GetBytes(message.Length);
                 await pipe.WriteAsync(requestLengthBytes, 0, 4);

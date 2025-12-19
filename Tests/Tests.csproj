@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp2.0;netcoreapp3.1;net6.0;net461</TargetFrameworks>
+    <TargetFrameworks>net6.0;netcoreapp3.1;net8.0;net9.0</TargetFrameworks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)' == 'net461'">
     <DefineConstants>$(DefineConstants);LEGACY_NET</DefineConstants>

@@ -9,6 +9,8 @@ public class CppStructBuilder : CppBlockBuilder
         macro = baseType != null ? $" : public {baseType}" : "";
         AppendLine($"struct {name}{macro}");
         BlockStart();
+        AppendLine("GENERATED_BODY()");
+        AppendLine("");
     }
 
     public CppStructBuilder AppendProperty(string propertyTypeName, string propertyName, bool blueprintEditable)

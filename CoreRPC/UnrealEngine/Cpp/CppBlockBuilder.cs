@@ -21,8 +21,8 @@ public class CppBlockBuilder
 
     public void BlockEnd()
     {
-        AppendLine("};");
         _currentSpace.Remove(_currentSpace.Length - 4, 4);
+        AppendLine("};");
     }
     
     public string Build()

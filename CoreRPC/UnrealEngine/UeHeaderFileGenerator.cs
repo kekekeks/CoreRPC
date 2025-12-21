@@ -16,7 +16,9 @@ public class UeHeaderFileGenerator
 
     private List<UeTypeDescriptor> _addedTypes = new List<UeTypeDescriptor>();
     
-    public UeHeaderFileGenerator(string headerName, bool needGeneratedType, UeTypeConverter typeConverter, UeCodeGenOptions options)
+    public UeHeaderFileGenerator(string headerName, bool needGeneratedType, 
+        UeTypeConverter typeConverter, 
+        UeCodeGenOptions options, string[] additionalIncludes = null)
     {
         _headerName = headerName;
         _needGeneratedType = needGeneratedType;
@@ -26,6 +28,13 @@ public class UeHeaderFileGenerator
         _header.AppendLine("#pragma once");
         _header.AppendLine();
         _header.AppendLine("#include \"CoreMinimal.h\"");
+        if (additionalIncludes?.Length > 0)
+        {
+            foreach (var include in additionalIncludes)
+            {
+                _header.AppendLine($"#include \"{include}\"");
+            }
+        }
         if (needGeneratedType)
         {
             _header.AppendLine($"#include \"{headerName}.generated.h\"");
@@ -65,6 +74,35 @@ public class UeHeaderFileGenerator
                 builder.AppendValue(enumValue.Key, enumValue.Value.ToString());
             }
             currentType.Append(builder.Build());
+        }
+        else if (typeDescriptor.IsClass)
+        {
+            var builder = new CppNativeClassHeaderBuilder(typeDescriptor.UeTypeName, "", 
+                typeDescriptor.BaseType != null ? new []{typeDescriptor.BaseType.UeTypeName} : null);
+            builder.AddConstructor(new Dictionary<string, string>(), CppVisibilityScope.Public);
+            foreach (var method in typeDescriptor.Methods)
+            {
+                var args = new Dictionary<string, string>();
+                foreach (KeyValuePair<string, Type> arg in method.Parameters)
+                {
+                    var argTypeDesc = _typeConverter.GetOrRegister(arg.Value, true);
+                    args.Add(argTypeDesc.UeTypeName, arg.Key);
+                }
+                var retType = method.ReturnType != null ? _typeConverter.GetOrRegister(method.ReturnType) : null;
+                var retTypeStr = retType != null ?
+                    method.ReturnTypeIsTask ? $"{_options.FutureClassName}<{retType.UeTypeName}>" : retType.UeTypeName :
+                    "void";
+                builder.AddMethod(method.MethodName, retTypeStr, CppVisibilityScope.Public, args,
+                    false, false);
+            }
+
+            foreach (var field in typeDescriptor.Properties)
+            {
+                var tField = _typeConverter.GetOrRegister(field.NetType, true);
+                builder.AddField(tField.UeTypeName, field.PropertyName, CppVisibilityScope.Private);
+            }
+            currentType.Append(builder.Build());
+
         }
         _addedTypes.Add(typeDescriptor);
         foreach (var type in deferredTypes)

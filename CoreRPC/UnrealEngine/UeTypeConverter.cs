@@ -2,12 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
+using CoreRPC.Binding;
 
 namespace CoreRPC.UnrealEngine;
 
 public class UeTypeConverter
 {
     private readonly UeCodeGenOptions _options;
+    private readonly IMethodBinder _methodBinder;
     private readonly List<UeTypeDescriptor> _registeredTypes = new();
     private readonly Dictionary<Type, UeTypeDescriptor> _typeMap = new();
 
@@ -32,9 +35,90 @@ public class UeTypeConverter
         _typeMap.Add(typeof(T), t);
     }
 
+    public void AddRpcType(Type t)
+    {
+        if (_typeMap.ContainsKey(t)) return;
+        var typeDescriptor = new UeTypeDescriptor()
+        {
+            NetType = t,
+            UeTypeName = ConvertTypeName(t.Name, "FCoreRpcProxy"),
+            BlueprintType = false,
+            BaseType = GetOrRegister(typeof(NullTypeForBaseTypes),false)
+        };
+        foreach (var methodInfo in t.GetMethods())
+        {
+            if (methodInfo.DeclaringType == typeof(object)) continue;
+            var methodDesc = new UeMethodDescriptor()
+            {
+                MethodInfo = methodInfo,
+                MethodName = methodInfo.Name,
+            };
+            methodDesc.ReturnType = methodInfo.ReturnType;
+            if (methodInfo.ReturnType == typeof(void))
+            {
+                methodDesc.ReturnType = null;
+                methodDesc.ReturnTypeIsTask = false;
+            }
+
+            if (methodDesc.ReturnType != null)
+            {
+                if (methodInfo.ReturnType.IsConstructedGenericType &&
+                    methodInfo.ReturnType.GetGenericTypeDefinition() == typeof(Task<>))
+                {
+                    methodDesc.ReturnType = methodInfo.ReturnType.GetGenericArguments()[0];
+                    methodDesc.ReturnTypeIsTask = true;
+                }
+            }
+            methodDesc.Parameters = methodInfo.GetParameters().ToDictionary(x => x.Name, x => x.ParameterType);
+            typeDescriptor.Methods.Add(methodDesc);
+        }
+        _registeredTypes.Add(typeDescriptor);
+        _typeMap.Add(t, typeDescriptor);
+    }
+
     public UeTypeDescriptor GetOrRegister(Type t, bool blueprintType = true)
     {
         if (_typeMap.TryGetValue(t, out var descriptor)) return descriptor;
+        if (t.IsArray)
+        {
+            var elType = GetOrRegister(t.GetElementType(), blueprintType);
+            return new UeTypeDescriptor()
+            {
+                UeTypeName = $"TArray<{elType.UeTypeName}>",
+                BaseType = null,
+                BlueprintType = blueprintType,
+                NetType = t,
+            };
+        }
+
+        if (t.IsConstructedGenericType)
+        {
+            var typeArg = t.GetGenericArguments()[0];
+            if (t.GetGenericTypeDefinition() == typeof(List<>) ||
+                t.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+            {
+                var typeArgDesc = GetOrRegister(typeArg, blueprintType);
+                return new UeTypeDescriptor()
+                {
+                    UeTypeName = $"TArray<{typeArgDesc.UeTypeName}>",
+                    BaseType = null,
+                    BlueprintType = blueprintType,
+                    NetType = t,
+                };
+            }
+            if (t.GetGenericTypeDefinition() == typeof(Task<>))
+            {
+                var typeArgDesc = GetOrRegister(typeArg, blueprintType);
+                return new UeTypeDescriptor()
+                {
+                    UeTypeName = $"{_options.FutureClassName}<{typeArgDesc.UeTypeName}>",
+                    BaseType = null,
+                    BlueprintType = false,
+                    NetType = t,
+                };
+            }
+        }
+
         var typeDescriptor = new UeTypeDescriptor()
         {
             NetType = t,
@@ -50,16 +134,23 @@ public class UeTypeConverter
         }
         else
         {
-            if (t.BaseType != typeof(object) && (t?.BaseType?.IsClass ?? false))
+            if (t.BaseType != typeof(object) && t.BaseType != typeof(Array) && (t?.BaseType?.IsClass ?? false))
             {
                 typeDescriptor.BaseType = GetOrRegister(t.BaseType, blueprintType);
             }
 
-            if (t.IsGenericType && t.GetGenericTypeDefinition() == _options.GenericTypeForResult)
+            if (t.IsConstructedGenericType)
             {
                 var typeArg = t.GetGenericArguments()[0];
                 typeDescriptor.UeTypeName = ConvertGenericTypeName(t.Name, typeArg.Name);
             }
+
+            if (t.IsArray)
+            {
+                var typeArgDesc = GetOrRegister(t.GetElementType(), blueprintType);
+                typeDescriptor.UeTypeName = $"TArray<{typeArgDesc.UeTypeName}>";
+            }
+
             var typeProps = t.GetProperties(BindingFlags.Instance | BindingFlags.Public);
             foreach (var prop in typeProps.Where(x =>
                          (x.GetMethod?.IsPublic ?? false)))
@@ -96,4 +187,5 @@ public class UeCodeGenOptions
     public string ApiDefine { get; set; }
     public string RpcClientBaseType { get; set; }
     public string FutureClassName { get; set; }
+    public string DtoHeaderName { get; set; }
 }

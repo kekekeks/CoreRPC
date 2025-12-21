@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace CoreRPC.UnrealEngine;
 
@@ -30,8 +31,9 @@ public class UePropertyDescriptor
 
 public class UeMethodDescriptor
 {
+    public MethodInfo MethodInfo { get; set; }
     public string MethodName { get; set; }
-    public Dictionary<string, string> Parameters { get; set; }
-    public string ReturnType { get; set; }
+    public Dictionary<string, Type> Parameters { get; set; }
+    public Type ReturnType { get; set; }
     public bool ReturnTypeIsTask { get; set; }
 }

@@ -13,15 +13,25 @@ public class CppBlockBuilder
         _currentSpace = new StringBuilder(currentSpace);
     }
 
-    public void BlockStart()
+    public virtual void BlockStart()
     {
         AppendLine("{");
+        AddSpace();
+    }
+
+    public void AddSpace()
+    {
         _currentSpace.Append("    ");
     }
 
-    public void BlockEnd()
+    public void RemoveSpace()
     {
-        _currentSpace.Remove(_currentSpace.Length - 4, 4);
+        if(_currentSpace.Length >= 4) _currentSpace.Remove(_currentSpace.Length - 4, 4);
+    }
+    
+    public virtual void BlockEnd()
+    {
+        RemoveSpace();
         AppendLine("};");
     }
     

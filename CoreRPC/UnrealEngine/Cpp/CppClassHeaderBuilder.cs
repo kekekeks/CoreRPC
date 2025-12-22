@@ -18,10 +18,10 @@ public class CppNativeClassHeaderBuilder : CppBlockBuilder
 
     private CppVisibilityScope _visibilityScope;
     
-    public CppNativeClassHeaderBuilder(string name, string currentSpace, string[] baseTypes = null) : base(currentSpace)
+    public CppNativeClassHeaderBuilder(string name, string currentSpace, string exportDefine = "", string[] baseTypes = null) : base(currentSpace)
     {
         _name = name;
-        var header = $"class {name}";
+        var header = $"class {exportDefine} {name}";
         if(baseTypes != null && baseTypes.Length > 0)
             header += $" : {string.Join(", ", baseTypes.Select(x => $"public {x}"))}";
         AppendLine(header);

@@ -10,12 +10,12 @@ namespace CoreRPC.AspNetCore
 {
     public class AspNetCoreRpcUnrealEngineCodeGenerator
     {
-        public static void GenerateCode(string path, IHostingEnvironment env, Action<TypescriptGenerationOptions> configure = null)
+        public static void GenerateCode(string path, IHostingEnvironment env, Action<UeCodeGenOptions> configure = null)
         {
             GenerateCode(path, RpcTypesResolver.GetRpcTypes(env), configure);
         }
         
-        public static void GenerateCode(string path, IEnumerable<Type> types, Action<TypescriptGenerationOptions> configure = null)
+        public static void GenerateCode(string path, IEnumerable<Type> types, Action<UeCodeGenOptions> configure = null)
         {
             var options = new UeCodeGenOptions()
             {
@@ -23,12 +23,13 @@ namespace CoreRPC.AspNetCore
                 FutureClassName = "SD::TExpectedFuture",
                 RpcClientBaseType = "FCoreRpcClientBase"
             };
+            configure?.Invoke(options);
             var codeGen = new UeRpcGenerator(path, options, new DefaultMethodBinder());
             Directory.CreateDirectory(path);
             foreach (var type in types)
             {
                 codeGen.TypeConverter.AddRpcType(type);
-                var className = "FCoreRpcProxy" + (type.IsInterface ? type.Name.Substring(1) : type.Name);
+                var className = options.ClassNamePrefix + (type.IsInterface ? type.Name.Substring(1) : type.Name);
                 var header = codeGen.GenerateHeaderForRpc(type, className);
                 File.WriteAllText(Path.Combine(path, $"{className}.h"), header);
                 var code = codeGen.GenerateCodeForRpc(type, className);

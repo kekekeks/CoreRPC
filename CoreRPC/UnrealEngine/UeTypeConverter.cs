@@ -41,7 +41,7 @@ public class UeTypeConverter
         var typeDescriptor = new UeTypeDescriptor()
         {
             NetType = t,
-            UeTypeName = ConvertTypeName(t.IsInterface ? t.Name.Substring(1) : t.Name, "FCoreRpcProxy"),
+            UeTypeName = ConvertTypeName(t.IsInterface ? t.Name.Substring(1) : t.Name, _options.ClassNamePrefix),
             BlueprintType = false,
             BaseType = GetOrRegister(typeof(NullTypeForBaseTypes),false)
         };
@@ -58,6 +58,11 @@ public class UeTypeConverter
             {
                 methodDesc.ReturnType = null;
                 methodDesc.ReturnTypeIsTask = false;
+            }
+            else if (methodInfo.ReturnType == typeof(Task))
+            {
+                methodDesc.ReturnType = null;
+                methodDesc.ReturnTypeIsTask = true;
             }
 
             if (methodDesc.ReturnType != null)
@@ -122,7 +127,7 @@ public class UeTypeConverter
         var typeDescriptor = new UeTypeDescriptor()
         {
             NetType = t,
-            UeTypeName = ConvertTypeName(t.Name, t.IsEnum ? "E" : "F"),
+            UeTypeName = ConvertTypeName(t.Name, t.IsEnum ? "E" + _options.ClassNamePrefix.Substring(1) : _options.ClassNamePrefix),
             BlueprintType = blueprintType
         };
         if (t.IsEnum)
@@ -188,6 +193,6 @@ public class UeCodeGenOptions
     public string RpcClientBaseType { get; set; }
     public string FutureClassName { get; set; }
     public string DtoHeaderName { get; set; }
-    
+    public string ClassNamePrefix { get; set; }
     public string[] Includes { get; set; }
 }

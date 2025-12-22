@@ -77,7 +77,7 @@ public class UeHeaderFileGenerator
         }
         else if (typeDescriptor.IsClass)
         {
-            var builder = new CppNativeClassHeaderBuilder(typeDescriptor.UeTypeName, "", 
+            var builder = new CppNativeClassHeaderBuilder(typeDescriptor.UeTypeName, "", _options.ApiDefine,
                 typeDescriptor.BaseType != null ? new []{typeDescriptor.BaseType.UeTypeName} : null);
             builder.AppendLine($"friend class FCoreRpcEngine;");
             builder.AddConstructor(new Dictionary<string, string>()
@@ -94,7 +94,7 @@ public class UeHeaderFileGenerator
                     args.Add(arg.Key, argTypeDesc.UeTypeName);
                 }
                 var retType = method.ReturnType != null ? _typeConverter.GetOrRegister(method.ReturnType) : null;
-                var retTypeStr = retType != null ? $"{_options.FutureClassName}<{retType.UeTypeName}>" : "void";
+                var retTypeStr = retType != null ? $"{_options.FutureClassName}<{retType.UeTypeName}>" : $"{_options.FutureClassName}<void>";
                 builder.AddMethod(method.MethodName, retTypeStr, CppVisibilityScope.Public, args,
                     false, false);
             }

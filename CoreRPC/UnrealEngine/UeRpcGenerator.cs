@@ -33,6 +33,8 @@ public class UeRpcGenerator
         TypeConverter.AddBase<byte>("int", true);
         TypeConverter.AddBase<float>("float", true);
         TypeConverter.AddBase<double>("double", true);
+        TypeConverter.AddBase<decimal>("double", true);
+        TypeConverter.AddBase<long>("int", true);
         TypeConverter.AddBase<NullTypeForBaseTypes>(options.RpcClientBaseType, false);
     }
 
@@ -65,16 +67,16 @@ public class UeRpcGenerator
         foreach (var method in typeInfo.Methods)
         {
             var retType = method.ReturnType != null ? TypeConverter.GetOrRegister(method.ReturnType) : null;
-            var retTypeStr = retType != null ?
-                method.ReturnTypeIsTask ? $"{_options.FutureClassName}<{retType.UeTypeName}>" : retType.UeTypeName :
-                "void";
+            var retTypeStr = retType != null
+                ? $"{_options.FutureClassName}<{retType.UeTypeName}>"
+                : $"{_options.FutureClassName}<void>";
             var argList =
                 method.Parameters.ToDictionary(x => x.Key, x => TypeConverter.GetOrRegister(x.Value).UeTypeName);
             codeBuilder.BeginMethod(method.MethodName, retTypeStr, argList);
             var firstLine = new StringBuilder();
-            if (retTypeStr != "void") firstLine.Append("return ");
+            firstLine.Append("return ");
             firstLine.Append("SendRequest");
-            if (retTypeStr != "void") firstLine.Append($"<{retType.UeTypeName}>");
+            firstLine.Append($"<{retType?.UeTypeName ?? "void"}>");
             firstLine.Append("(FMethodCallBuilder()");
             codeBuilder.AppendLine(firstLine.ToString());
             codeBuilder.AddSpace();

@@ -94,9 +94,7 @@ public class UeHeaderFileGenerator
                     args.Add(arg.Key, argTypeDesc.UeTypeName);
                 }
                 var retType = method.ReturnType != null ? _typeConverter.GetOrRegister(method.ReturnType) : null;
-                var retTypeStr = retType != null ?
-                    method.ReturnTypeIsTask ? $"{_options.FutureClassName}<{retType.UeTypeName}>" : retType.UeTypeName :
-                    "void";
+                var retTypeStr = retType != null ? $"{_options.FutureClassName}<{retType.UeTypeName}>" : "void";
                 builder.AddMethod(method.MethodName, retTypeStr, CppVisibilityScope.Public, args,
                     false, false);
             }

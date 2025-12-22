@@ -25,11 +25,8 @@ public class CppNativeClassHeaderBuilder : CppBlockBuilder
         if(baseTypes != null && baseTypes.Length > 0)
             header += $" : {string.Join(", ", baseTypes.Select(x => $"public {x}"))}";
         AppendLine(header);
+        _visibilityScope = CppVisibilityScope.Private;
         BlockStart();
-        RemoveSpace();
-        AppendLine("public:");
-        AddSpace();
-        _visibilityScope = CppVisibilityScope.Public;
         AppendLine("");
     }
 
@@ -44,15 +41,17 @@ public class CppNativeClassHeaderBuilder : CppBlockBuilder
     private void CheckScope(CppVisibilityScope scope)
     {
         if (_visibilityScope == scope) return;
+        RemoveSpace();
         AppendLine(GetScopeLine(scope));
         _visibilityScope = scope;
+        AddSpace();
     }
 
     public void AddConstructor(Dictionary<string, string> arguments, CppVisibilityScope visibility)
     {
         CheckScope(visibility);
         var methodInfo = $"{_name}(";
-        methodInfo += string.Join(", ", arguments.Select(x => $"{x.Key} {x.Value}"));
+        methodInfo += string.Join(", ", arguments.Select(x => $"{x.Value} {x.Key}"));
         methodInfo += $")";
         methodInfo += ";";
         AppendLine(methodInfo);
@@ -64,7 +63,7 @@ public class CppNativeClassHeaderBuilder : CppBlockBuilder
         CheckScope(visibility);
         var modifiers = isVirtual ? "virtual " : "";
         var methodInfo = $"{modifiers}{returnType} {name}(";
-        methodInfo += string.Join(", ", arguments.Select(x => $"{x.Key} {x.Value}"));
+        methodInfo += string.Join(", ", arguments.Select(x => $"{x.Value} {x.Key}"));
         methodInfo += $")";
         if (isOverride) methodInfo += " override";
         methodInfo += ";";

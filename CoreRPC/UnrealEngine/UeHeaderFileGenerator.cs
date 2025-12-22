@@ -79,14 +79,19 @@ public class UeHeaderFileGenerator
         {
             var builder = new CppNativeClassHeaderBuilder(typeDescriptor.UeTypeName, "", 
                 typeDescriptor.BaseType != null ? new []{typeDescriptor.BaseType.UeTypeName} : null);
-            builder.AddConstructor(new Dictionary<string, string>(), CppVisibilityScope.Public);
+            builder.AppendLine($"friend class FCoreRpcEngine;");
+            builder.AddConstructor(new Dictionary<string, string>()
+            {
+                { "Url" , "FString" },
+                { "Auth", "FString" }
+            }, CppVisibilityScope.Private);
             foreach (var method in typeDescriptor.Methods)
             {
                 var args = new Dictionary<string, string>();
                 foreach (KeyValuePair<string, Type> arg in method.Parameters)
                 {
                     var argTypeDesc = _typeConverter.GetOrRegister(arg.Value, true);
-                    args.Add(argTypeDesc.UeTypeName, arg.Key);
+                    args.Add(arg.Key, argTypeDesc.UeTypeName);
                 }
                 var retType = method.ReturnType != null ? _typeConverter.GetOrRegister(method.ReturnType) : null;
                 var retTypeStr = retType != null ?

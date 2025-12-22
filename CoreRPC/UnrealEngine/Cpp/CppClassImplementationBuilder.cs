@@ -27,10 +27,29 @@ public class CppClassImplementationBuilder : CppBlockBuilder
         
     }
 
+    public void BeginConstructor(Dictionary<string, string> args, string baseTypeName = null,
+        string[] baseCallArgs = null)
+    {
+        var methodHead = $"{_className}::{_className}(";
+        methodHead += string.Join(", ", args.Select(x => $"{x.Value} {x.Key}"));
+        methodHead += ")";
+        if (baseTypeName != null)
+        {
+            methodHead += $" : {baseTypeName}(";
+            if (baseCallArgs?.Length > 0)
+            {
+                methodHead += string.Join(", ", baseCallArgs);
+            }
+            methodHead += ")";
+        }
+        AppendLine(methodHead);
+        BlockStart();
+    }
+    
     public void BeginMethod(string methodName, string returnType, Dictionary<string, string> args)
     {
         var methodHead = $"{returnType} {_className}::{methodName}(";
-        methodHead += string.Join(", ", args.Select(x => $"{x.Key} {x.Value}"));
+        methodHead += string.Join(", ", args.Select(x => $"{x.Value} {x.Key}"));
         methodHead += ")";
         AppendLine(methodHead);
         BlockStart();

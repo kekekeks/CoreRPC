@@ -40,9 +40,11 @@ public class UeRpcGenerator
     {
         var headerGenerator = new UeHeaderFileGenerator(headerName, false, TypeConverter, _options, new[]
         {
-            "CoreRpcClientBase.h",
-            "Async/Future.h"
-        });
+            $"{_options.DtoHeaderName}.h",
+        }.Concat(_options.Includes ?? []).Concat(new[]
+        {
+            "../CoreRpc/CoreRpcClientBase.h"
+        }).ToArray());
         headerGenerator.AddType(rpcType);
         return headerGenerator.BuildHeader();
     }
@@ -52,8 +54,14 @@ public class UeRpcGenerator
         var typeInfo = TypeConverter.GetOrRegister(rpcType);
         var codeBuilder = new CppClassImplementationBuilder(typeInfo.UeTypeName, "", new[]
         {
-            "CoreRpcClientBase.h",
-        });
+            "../CoreRpc/CoreRpcClientBase.h",
+        }.Concat(_options.Includes ?? []).ToArray());
+        codeBuilder.BeginConstructor(new Dictionary<string, string>()
+        {
+            { "Url", "FString" },
+            { "Auth", "FString" }
+        }, _options.RpcClientBaseType, new[] { "Url", "Auth" });
+        codeBuilder.EndMethod();
         foreach (var method in typeInfo.Methods)
         {
             var retType = method.ReturnType != null ? TypeConverter.GetOrRegister(method.ReturnType) : null;
@@ -61,11 +69,11 @@ public class UeRpcGenerator
                 method.ReturnTypeIsTask ? $"{_options.FutureClassName}<{retType.UeTypeName}>" : retType.UeTypeName :
                 "void";
             var argList =
-                method.Parameters.ToDictionary(x => TypeConverter.GetOrRegister(x.Value).UeTypeName, x => x.Key);
+                method.Parameters.ToDictionary(x => x.Key, x => TypeConverter.GetOrRegister(x.Value).UeTypeName);
             codeBuilder.BeginMethod(method.MethodName, retTypeStr, argList);
             var firstLine = new StringBuilder();
             if (retTypeStr != "void") firstLine.Append("return ");
-            firstLine.Append("Client->SendRequest");
+            firstLine.Append("SendRequest");
             if (retTypeStr != "void") firstLine.Append($"<{retType.UeTypeName}>");
             firstLine.Append("(FMethodCallBuilder()");
             codeBuilder.AppendLine(firstLine.ToString());

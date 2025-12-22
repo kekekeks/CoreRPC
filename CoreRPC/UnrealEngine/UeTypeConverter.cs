@@ -41,7 +41,7 @@ public class UeTypeConverter
         var typeDescriptor = new UeTypeDescriptor()
         {
             NetType = t,
-            UeTypeName = ConvertTypeName(t.Name, "FCoreRpcProxy"),
+            UeTypeName = ConvertTypeName(t.IsInterface ? t.Name.Substring(1) : t.Name, "FCoreRpcProxy"),
             BlueprintType = false,
             BaseType = GetOrRegister(typeof(NullTypeForBaseTypes),false)
         };
@@ -188,4 +188,6 @@ public class UeCodeGenOptions
     public string RpcClientBaseType { get; set; }
     public string FutureClassName { get; set; }
     public string DtoHeaderName { get; set; }
+    
+    public string[] Includes { get; set; }
 }

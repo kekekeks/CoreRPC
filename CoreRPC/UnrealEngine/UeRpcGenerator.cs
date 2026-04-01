@@ -43,7 +43,7 @@ public class UeRpcGenerator
         var headerGenerator = new UeHeaderFileGenerator(headerName, false, TypeConverter, _options, new[]
         {
             $"{_options.DtoHeaderName}.h",
-        }.Concat(_options.Includes ?? []).Concat(new[]
+        }.Concat(_options.Includes ?? Array.Empty<string>()).Concat(new[]
         {
             "../CoreRpc/CoreRpcClientBase.h"
         }).ToArray());
@@ -57,7 +57,7 @@ public class UeRpcGenerator
         var codeBuilder = new CppClassImplementationBuilder(typeInfo.UeTypeName, "", new[]
         {
             "../CoreRpc/CoreRpcClientBase.h",
-        }.Concat(_options.Includes ?? []).ToArray());
+        }.Concat(_options.Includes ?? Array.Empty<string>()).ToArray());
         codeBuilder.BeginConstructor(new Dictionary<string, string>()
         {
             { "Url", "FString" },

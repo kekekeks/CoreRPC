@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.IO.Pipes;
+using System.Threading;
 using System.Threading.Tasks;
 using CoreRPC.Utility;
 using Microsoft.IO;
@@ -11,11 +12,13 @@ namespace CoreRPC.Transport.NamedPipe
     {
         private readonly string _serverName;
         private readonly string _pipeName;
+        private readonly int _timeout;
 
-        public NamedPipeClientTransport(string pipeName, string serverName = ".")
+        public NamedPipeClientTransport(string pipeName, string serverName = ".", int timeout = Timeout.Infinite)
         {
             _serverName = serverName;
             _pipeName = pipeName;
+            _timeout = timeout;
         }
 
         
@@ -23,7 +26,7 @@ namespace CoreRPC.Transport.NamedPipe
         {
             using (var pipe = new NamedPipeClientStream(_serverName, _pipeName, PipeDirection.InOut, PipeOptions.Asynchronous))
             {
-                await pipe.ConnectAsync();
+                await pipe.ConnectAsync(_timeout);
 
                 var requestLengthBytes = BitConverter.GetBytes(message.Length);
                 await pipe.WriteAsync(requestLengthBytes, 0, 4);
